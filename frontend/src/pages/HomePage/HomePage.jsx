@@ -1,8 +1,9 @@
+import {QuizList} from "../../components/QuizList/QuizList.jsx";
 
 const HomePage = () => {
     return (
         <>
-            <h1>HomePage</h1>
+            <QuizList/>
         </>
     )
 }

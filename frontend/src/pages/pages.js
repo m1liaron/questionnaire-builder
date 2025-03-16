@@ -1,2 +1,2 @@
-export { HomePage } from "./HomePage/HomePage.js";
-export { QuizPage } from "./QuizPage/QuizPage.js";
+export { HomePage } from "./HomePage/HomePage.jsx";
+export { QuizPage } from "./QuizPage/QuizPage.jsx";
