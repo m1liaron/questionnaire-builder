@@ -42,6 +42,20 @@ const QuestionList = () => {
           }))
       };
 
+    const handleRemoveAnswer = (answerId, questionId) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) =>
+               q.id === questionId ?
+                   {
+                       ...q,
+                       answers: q.answers.filter(answer => answer.id !== answerId)
+                   } : q
+
+            )
+        }))
+    };
+
     const handleQuestionChange = (questionId, newText) => {
         setQuiz((prev) => ({
             ...prev,
@@ -162,6 +176,7 @@ const QuestionList = () => {
                         index={index}
                         answers={q.answers}
                         onRemoveQuestion={handleRemoveQuestion}
+                        onRemoveAnswer={handleRemoveAnswer}
                         onQuestionChange={handleQuestionChange}
                         onTypeChange={handleTypeChange}
                         onAnswerChange={handleAnswerChange}

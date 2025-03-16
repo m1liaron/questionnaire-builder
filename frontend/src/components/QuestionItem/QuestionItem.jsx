@@ -1,10 +1,12 @@
 import { FaTrash } from "react-icons/fa";
+import {Button} from "react-bootstrap";
 
 const QuestionItem = ({
   question,
   index,
   answers,
   onRemoveQuestion,
+  onRemoveAnswer,
   onQuestionChange,
   onTypeChange,
   onAnswerChange,
@@ -53,8 +55,13 @@ const QuestionItem = ({
           <div>
             <span>Answers</span>
             <ul className="list-group">
+              {(type === "Single Choice" || type === "Multiple Choices") && answers.length < 5 && (
+                  <Button type="button" onClick={() => onAddAnswer(id)}>
+                    Add Answer
+                  </Button>
+              )}
               {type !== "Text" && answers.map((answer, idx) => (
-                  <li key={answer.id} className="list-group-item">
+                  <li key={answer.id} className="list-group-item d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center gap-3">
                       {type === "Single Choice" && (
                           <input
@@ -84,14 +91,10 @@ const QuestionItem = ({
                         />
                       </div>
                     </div>
+                    <FaTrash size={30} color="red" cursor="pointer" onClick={() => onRemoveAnswer(answer.id, id)} />
                   </li>
               ))}
             </ul>
-            {(type === "Single Choice" || type === "Multiple Choices") && answers.length < 5 && (
-                <button type="button" onClick={() => onAddAnswer(id)}>
-                  Add Answer
-                </button>
-            )}
           </div>
       )}
     </div>
