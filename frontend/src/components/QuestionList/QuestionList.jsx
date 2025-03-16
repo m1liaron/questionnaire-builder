@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {FaTrash} from "react-icons/fa";
+import { QuestionItem } from "../QuestionItem/QuestionItem";
 
 const QuestionList = () => {
     const [questions, setQuestions] = useState([{
@@ -24,23 +25,13 @@ const QuestionList = () => {
         <form>
             <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
             <div>
-                {questions?.map((question) => (
-                    <div key={question.id} className="d-flex align-items-center gap-5">
-                        <div className="d-flex align-items-center">
-                            <div className="mb-3">
-                                <label htmlFor="exampleInputEmail1" className="form-label">Question</label>
-                                <input type="text" className="form-control" id="exampleInputEmail1"/>
-                            </div>
-                            <select name="type">
-                                <option value="text">Text</option>
-                                <option value="single choice">Single Choice</option>
-                                <option value="multiple choices">Multiple Choices</option>
-                            </select>
-                        </div>
-                        <FaTrash size={30} color="red" cursor="pointer"
-                                 onClick={() => handleRemoveQuestion(question.id)}/>
-                    </div>
-                ))}
+                {questions?.map((question, index) => 
+                    <QuestionItem 
+                        key={question.id} 
+                        id={question.id} 
+                        index={index}
+                        handleRemoveQuestion={handleRemoveQuestion}
+                    />)}
             </div>
         </form>
     )
