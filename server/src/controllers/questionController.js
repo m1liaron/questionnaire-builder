@@ -3,9 +3,9 @@ import {StatusCodes} from "http-status-codes";
 
 const createQuestion = async (req, res) => {
     try{
-        const existingQuestionnaire = await Question.create(req.body);
+        const existingQuestion = await Question.create(req.body);
 
-        res.status(StatusCodes.CREATED).send(existingQuestionnaire);
+        res.status(StatusCodes.CREATED).send(existingQuestion);
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
     }
