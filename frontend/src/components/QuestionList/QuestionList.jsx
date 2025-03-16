@@ -7,9 +7,7 @@ const QuestionList = () => {
         question: 'Question 1',
         type: 'Text'
     }]);
-    const [answers, setAnswers] = useState([
-        { id: 1, questionId: 1, answer: 'Answer 1', isCorrect: true },
-    ]);
+    const [answers, setAnswers] = useState([]);
 
     const generateNewId = (items) => {
         return items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
@@ -58,9 +56,9 @@ const QuestionList = () => {
         setQuestions(questions.map(q => q.id === questionId ? { ...q, type: newType } : q));
         if(newType === "Text") {
             setAnswers((prev) => {
-                const related = prev.filter(a => a.questionId === id);
+                const related = prev.filter(a => a.questionId === questionId);
                 const keep = related.slice(0,1);
-                return [...prev.filter((a => a.questionId !== id)), ...keep]
+                return [...prev.filter((a => a.questionId !== questionId)), ...keep]
             })
         }
      }    
@@ -89,7 +87,10 @@ const QuestionList = () => {
     
     return (
         <form>
-            <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
+            <div className="d-flex gap-3">
+                <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
+                <button type="button" className="btn btn-success" onClick={handleAddQuestion}>Create Quiz</button>
+            </div>
             <div>
                 {questions.map((q, index) => (
                     <QuestionItem

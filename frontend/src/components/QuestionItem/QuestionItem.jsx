@@ -13,9 +13,6 @@ const QuestionItem = ({
 }) => {
   const { id, question: questionText, type } = question;
 
-  // If type is Text, only allow one answer.
-  const displayedAnswers = type === "Text" ? answers.slice(0, 1) : answers;
-
   return (
     <div className="border border-2 m-2 p-2">
       <div className="d-flex align-items-center gap-5">
@@ -51,51 +48,54 @@ const QuestionItem = ({
         </div>
         <FaTrash size={30} color="red" cursor="pointer" onClick={() => onRemoveQuestion(id)} />
       </div>
-      <div>
-        <span>Answers</span>
-        <ul className="list-group">
-          {displayedAnswers.map((answer, idx) => (
-            <li key={answer.id} className="list-group-item">
-              <div className="d-flex align-items-center gap-3">
-                {type === "Single Choice" && (
-                  <input
-                    type="radio"
-                    name={`correct-${id}`}
-                    checked={answer.isCorrect || false}
-                    onChange={() => onToggleCorrectAnswer(id, answer.id, "single")}
-                  />
-                )}
-                {type === "Multiple Choices" && (
-                  <input
-                    type="checkbox"
-                    checked={answer.isCorrect || false}
-                    onChange={() => onToggleCorrectAnswer(id, answer.id, "multiple")}
-                  />
-                )}
-                <div>
-                  <label htmlFor={`answer-${answer.id}`} className="form-label">
-                    Choice {idx + 1}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id={`answer-${answer.id}`}
-                    value={answer.answer}
-                    onChange={(e) => onAnswerChange(answer.id, e.target.value)}
-                  />
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-        {(type === "Single Choice" || type === "Multiple Choices") && displayedAnswers.length < 5 && (
-          <button type="button" onClick={() => onAddAnswer(id)}>
-            Add Answer
-          </button>
-        )}
-      </div>
+
+      {type !== "Text" && (
+          <div>
+            <span>Answers</span>
+            <ul className="list-group">
+              {type !== "Text" && answers.map((answer, idx) => (
+                  <li key={answer.id} className="list-group-item">
+                    <div className="d-flex align-items-center gap-3">
+                      {type === "Single Choice" && (
+                          <input
+                              type="radio"
+                              name={`correct-${id}`}
+                              checked={answer.isCorrect || false}
+                              onChange={() => onToggleCorrectAnswer(id, answer.id, "single")}
+                          />
+                      )}
+                      {type === "Multiple Choices" && (
+                          <input
+                              type="checkbox"
+                              checked={answer.isCorrect || false}
+                              onChange={() => onToggleCorrectAnswer(id, answer.id, "multiple")}
+                          />
+                      )}
+                      <div>
+                        <label htmlFor={`answer-${answer.id}`} className="form-label">
+                          Choice {idx + 1}
+                        </label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id={`answer-${answer.id}`}
+                            value={answer.answer}
+                            onChange={(e) => onAnswerChange(answer.id, e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </li>
+              ))}
+            </ul>
+            {(type === "Single Choice" || type === "Multiple Choices") && answers.length < 5 && (
+                <button type="button" onClick={() => onAddAnswer(id)}>
+                  Add Answer
+                </button>
+            )}
+          </div>
+      )}
     </div>
   );
 };
 
-export { QuestionItem };
+export {QuestionItem};
