@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon src/app.js",
     "format": "npx @biomejs/biome format --write ./src",
-    "lint": "npx @biomejs/biome lint --write --write ./src",
+    "lint": "npx @biomejs/biome lint --write ./src",
     "check": "npx @biomejs/biome check --write ./src"
   },
   "dependencies": {

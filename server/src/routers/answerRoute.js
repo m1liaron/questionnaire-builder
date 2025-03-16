@@ -5,4 +5,4 @@ import { createAnswer } from "../controllers/answerController.js";
 
 router.route("/").post(createAnswer);
 
-export { router as answerRoute }
+export { router as answerRoute };
