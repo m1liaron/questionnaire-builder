@@ -1,19 +1,20 @@
 {
   "name": "server",
   "version": "1.0.0.0",
-  "main": "index.js",
+  "main": "src/app.js",
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "nodemon index.js",
-    "format" : "npx @biomejs/biome format --write ./src",
-    "lint" : "npx @biomejs/biome lint --write --write ./src",
+    "dev": "nodemon src/app.js",
+    "format": "npx @biomejs/biome format --write ./src",
+    "lint": "npx @biomejs/biome lint --write --write ./src",
     "check": "npx @biomejs/biome check --write ./src"
   },
   "dependencies": {
     "express": "^4.21.2",
     "http-status-codes": "^2.3.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "sequelize": "^6.37.6"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4"
