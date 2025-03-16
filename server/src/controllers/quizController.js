@@ -68,14 +68,25 @@ const getQuiz = async (req, res) => {
 };
 const getQuizzes = async (req, res) => {
 	try {
-		const findQuestionnaire = await Quiz.findAll();
-		if (!findQuestionnaire) {
+		const foundQuizzes = await Quiz.findAll({
+			include: [{
+				model: Question,
+				as: "questions",
+				attributes: ["id"]
+			}]
+		});
+		if (!foundQuizzes || !foundQuizzes.length) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ error: true, message: "Questionnaire Not Found" });
 		}
 
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+		const quizzesWithCount = foundQuizzes.map((quiz) => {
+			const quizObj = quiz.toJSON();
+			quizObj.questionsAmount = quizObj.questions ? quizObj.questions.length : 0;
+			return quizObj;
+		});
+		res.status(StatusCodes.OK).json(quizzesWithCount);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
