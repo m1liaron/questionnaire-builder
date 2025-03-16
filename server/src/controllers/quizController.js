@@ -2,10 +2,11 @@ import { Quiz } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
 const createQuiz = async (req, res) => {
+	console.log(req.body)
 	try {
-		const existingQuestionnaire = await Quiz.create(req.body);
+		const createdQuiz = await Quiz.create(req.body);
 
-		res.status(StatusCodes.CREATED).send(existingQuestionnaire);
+		res.status(StatusCodes.CREATED).json(createdQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -31,10 +32,7 @@ const getQuiz = async (req, res) => {
 };
 const getQuizzes = async (req, res) => {
 	try {
-		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findAll({
-			where: { id: quizId },
-		});
+		const findQuestionnaire = await Quiz.findAll();
 		if (!findQuestionnaire) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
