@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
-import { Questionnaire } from "./models.js";
+import { Quiz } from "./models.js";
 
 const Question = sequelize.define("Question", {
     id: {
@@ -16,7 +16,7 @@ const Question = sequelize.define("Question", {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: Questionnaire,
+            model: Quiz,
             key: 'id',
         }
     },

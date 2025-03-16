@@ -5,3 +5,5 @@ import { getQuiz, getQuizzes, createQuiz, updateQuiz, removeQuiz} from "../contr
 
 router.route("/").post(createQuiz).get(getQuizzes);
 router.route("/:id").get(getQuiz).patch(updateQuiz).delete(removeQuiz);
+
+export { router as quizRoute }
