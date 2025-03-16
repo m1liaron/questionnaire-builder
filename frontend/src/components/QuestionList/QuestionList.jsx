@@ -1,5 +1,7 @@
 import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
+import ToastContext from "react-bootstrap/ToastContext";
+import {toast, ToastContainer} from "react-toastify";
 
 const QuestionList = () => {
     const [quiz, setQuiz] = useState({
@@ -154,28 +156,53 @@ const QuestionList = () => {
         setQuiz(prev => ({ ...prev, description: value }));
     }
 
-  const validateQuizData = () => {
-          const questionsValues = Object.values(quiz.questions);
-          const answersValues = Object.values(quiz.answers);
-          for(let question of questionsValues) {
-              if(question.includes('Question') || !question.length) {
-                  return console.error(`Template question has not been changed: ${question}`)
-              }
-          }
+    const validateQuizData = () => {
+        if (!quiz.name.trim()) {
+            toast.error("Quiz title is required!");
+            return false;
+        }
 
-          for(let answer of answersValues) {
-              if(answer.includes('Answer') || !answer.length) {
-                  return console.error(`Template answer has not been changed: ${answer}`)
-              }
-          }
-      }
+        if (!quiz.description.trim()) {
+            toast.error("Quiz description is required!");
+            return false;
+        }
+
+        if (!quiz.questions.length) {
+            toast.error("Add at least 1 question!");
+            return false;
+        }
+
+        for (let question of quiz.questions) {
+            if (!question.text.trim() || question.text.startsWith("Question")) {
+                toast.error(`Question "${question.text}" needs to be modified.`);
+                return false;
+            }
+
+            if (question.type !== "Text" && question.answers.length < 2) {
+                toast.error(`Question "${question.text}" must have at least 2 answers.`);
+                return false;
+            }
+
+            for (let answer of question.answers) {
+                if (!answer.answer.trim() || answer.answer.startsWith("Answer")) {
+                    toast.error(`Answer "${answer.answer}" for question "${question.text}" needs to be modified.`);
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    };
+
 
   const createQuiz = () => {
+        validateQuizData();
         console.log(quiz)
   }
 
     return (
         <div>
+            <ToastContainer/>
             <div className="mb-5">
                 <div className="mb-3">
                     <label htmlFor="exampleInputEmail1" className="form-label">Title</label>
