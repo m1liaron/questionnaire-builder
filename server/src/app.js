@@ -2,13 +2,14 @@ import express from 'express';
 const app = express();
 import cors from 'cors';
 import { connectDB, sequelize } from "./db/sequelize.js";
-import {quizRoute} from "./routers/quizRoute.js";
+import { quizRoute, questionRoute } from "./routers/routers.js";
 
 app.use(express.json());
 app.use(cors());
 
 // routes
 app.use("/quizzes", quizRoute);
+app.use("/questions", questionRoute);
 
 const port = process.env.PORT || 3000;
 
