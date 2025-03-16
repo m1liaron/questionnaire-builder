@@ -5,7 +5,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "format" : "npx @biomejs/biome format --write ./src",
+    "lint" : "npx @biomejs/biome lint --write --write ./src",
+    "check": "npx @biomejs/biome check --write ./src"
   },
   "dependencies": {
     "express": "^4.21.2",
