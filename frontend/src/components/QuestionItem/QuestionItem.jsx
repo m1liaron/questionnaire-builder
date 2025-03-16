@@ -6,11 +6,15 @@ const QuestionItem = ({
   answers,
   onRemoveQuestion,
   onQuestionChange,
-  onAnswerChange
+  onTypeChange,
+  onAnswerChange,
+  onToggleCorrectAnswer,
+  onAddAnswer
 }) => {
   const { id, question: questionText, type } = question;
 
-    const filteredAnswers = answers.filter(answer => answer.questionId === id);
+  // If type is Text, only allow one answer.
+  const displayedAnswers = type === "Text" ? answers.slice(0, 1) : answers;
 
   return (
     <div className="border border-2 m-2 p-2">
@@ -26,14 +30,19 @@ const QuestionItem = ({
               className="form-control"
               id={`question-${id}`}
               value={questionText}
-              onChange={(e) => onQuestionChange(e.target.value)}
+              onChange={(e) => onQuestionChange(id, e.target.value)}
             />
           </div>
           <div className="mb-3">
             <label htmlFor={`type-${id}`} className="form-label">
               Type
             </label>
-            <select name="type" id={`type-${id}`} value={type}>
+            <select
+              name="type"
+              id={`type-${id}`}
+              value={type}
+              onChange={(e) => onTypeChange(id, e.target.value)}
+            >
               <option value="Text">Text</option>
               <option value="Single Choice">Single Choice</option>
               <option value="Multiple Choices">Multiple Choices</option>
@@ -44,24 +53,46 @@ const QuestionItem = ({
       </div>
       <div>
         <span>Answers</span>
-          {filteredAnswers.map((answer, idx) => (
-            <ul className="list-group">
-                <li key={answer.id} className="list-group-item">
+        <ul className="list-group">
+          {displayedAnswers.map((answer, idx) => (
+            <li key={answer.id} className="list-group-item">
+              <div className="d-flex align-items-center gap-3">
+                {type === "Single Choice" && (
+                  <input
+                    type="radio"
+                    name={`correct-${id}`}
+                    checked={answer.isCorrect || false}
+                    onChange={() => onToggleCorrectAnswer(id, answer.id, "single")}
+                  />
+                )}
+                {type === "Multiple Choices" && (
+                  <input
+                    type="checkbox"
+                    checked={answer.isCorrect || false}
+                    onChange={() => onToggleCorrectAnswer(id, answer.id, "multiple")}
+                  />
+                )}
                 <div>
-                    <label htmlFor={`answer-${answer.id}`} className="form-label">
+                  <label htmlFor={`answer-${answer.id}`} className="form-label">
                     Choice {idx + 1}
-                    </label>
-                    <input
+                  </label>
+                  <input
                     type="text"
                     className="form-control"
                     id={`answer-${answer.id}`}
                     value={answer.answer}
                     onChange={(e) => onAnswerChange(answer.id, e.target.value)}
-                    />
+                  />
                 </div>
-                </li>
-            </ul>
+              </div>
+            </li>
           ))}
+        </ul>
+        {(type === "Single Choice" || type === "Multiple Choices") && displayedAnswers.length < 5 && (
+          <button type="button" onClick={() => onAddAnswer(id)}>
+            Add Answer
+          </button>
+        )}
       </div>
     </div>
   );

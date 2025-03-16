@@ -8,14 +8,12 @@ const QuestionList = () => {
         type: 'Text'
     }]);
     const [answers, setAnswers] = useState([
-        { id: 1, questionId: 1, answer: 'Answer 1' },
+        { id: 1, questionId: 1, answer: 'Answer 1', isCorrect: true },
     ]);
 
     const generateNewId = (items) => {
         return items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
       };
-
-      console.log(answers)
 
       const handleAddQuestion = () => {
         const newQuestionId = generateNewId(questions);
@@ -33,7 +31,8 @@ const QuestionList = () => {
           {
             id: newAnswerId,
             questionId: newQuestionId,
-            answer: ""
+            answer: "",
+            isCorrect: false
           }
         ]);
       };
@@ -54,22 +53,58 @@ const QuestionList = () => {
           prev.map((a) => (a.id === answerId ? { ...a, answer: newText } : a))
         );
       };
+
+      const handleTypeChange = (questionId, newType) => {
+        setQuestions(questions.map(q => q.id === questionId ? { ...q, type: newType } : q));
+        if(newType === "Text") {
+            setAnswers((prev) => {
+                const related = prev.filter(a => a.questionId === id);
+                const keep = related.slice(0,1);
+                return [...prev.filter((a => a.questionId !== id)), ...keep]
+            })
+        }
+     }    
+
+     const handleToggleCorrectAnswer = (questionId, answerId, mode) => {
+        if (mode === "single") {
+          // For single choice, mark only the chosen answer as correct.
+          setAnswers(answers.map(a =>
+            a.questionId === questionId ? { ...a, isCorrect: a.id === answerId } : a
+          ));
+        } else {
+          // For multiple choices, toggle the isCorrect value.
+          setAnswers(answers.map(a =>
+            a.id === answerId ? { ...a, isCorrect: !a.isCorrect } : a
+          ));
+        }
+      };
+
+      const handleAddAnswer = (questionId) => {
+        const currentAnswers = answers.filter(a => a.questionId === questionId);
+        if (currentAnswers.length < 5) {
+          const newAnswerId = generateNewId(answers);
+          setAnswers([...answers, { id: newAnswerId, questionId, answer: "", isCorrect: false }]);
+        }
+      };
     
     return (
         <form>
             <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
             <div>
-                {questions?.map((question, index) => 
-                    <QuestionItem 
-                        key={question.id} 
-                        question={question}
+                {questions.map((q, index) => (
+                    <QuestionItem
+                        key={q.id}
+                        question={q}
                         index={index}
-                        answers={answers}
+                        answers={answers.filter(a => a.questionId === q.id)}
                         onRemoveQuestion={handleRemoveQuestion}
-                        onQuestionChange={(newText) => handleQuestionChange(question.id, newText)}
+                        onQuestionChange={handleQuestionChange}
+                        onTypeChange={handleTypeChange}
                         onAnswerChange={handleAnswerChange}
+                        onToggleCorrectAnswer={handleToggleCorrectAnswer}
+                        onAddAnswer={handleAddAnswer}
                     />
-                )}
+                ))}
             </div>
         </form>
     )
