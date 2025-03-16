@@ -15,8 +15,7 @@ const QuizList = () => {
     }, []);
 
     return (
-        <div className="p-3">
-            <h1>Quiz Catalog</h1>
+        <div>
 
             <div className="d-flex justify-content-center flex-wrap align-items-center gap-5 p-3">
                 {quizzes?.length && (

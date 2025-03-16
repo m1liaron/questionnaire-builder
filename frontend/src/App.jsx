@@ -4,8 +4,7 @@ import {
     Routes
 } from "react-router-dom";
 import { AppPath } from "./common/enums/AppPath.js";
-import {HomePage} from "./pages/HomePage/HomePage.jsx";
-import {QuizPage} from "./pages/QuizPage/QuizPage.jsx";
+import { CreateQuizPage, HomePage, QuizPage } from "./pages/pages.js";
 
 function App() {
   return (
@@ -13,6 +12,7 @@ function App() {
         <Routes>
             <Route path={AppPath.HomePage} element={<HomePage/>}/>
             <Route path={AppPath.QuizPage} element={<QuizPage/>}/>
+            <Route path={AppPath.CreateQUiz} element={<CreateQuizPage/>}/>
         </Routes>
     </BrowserRouter>
   )

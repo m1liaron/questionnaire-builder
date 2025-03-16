@@ -1,7 +1,8 @@
 
 const AppPath = {
     HomePage: "/",
-    QuizPage: "/quiz:quizId"
+    QuizPage: "/quiz:quizId",
+    CreateQUiz: "/create-quiz"
 }
 
 export { AppPath };
