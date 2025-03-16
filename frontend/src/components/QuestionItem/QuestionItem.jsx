@@ -87,7 +87,7 @@ const QuestionItem = ({
                             className="form-control"
                             id={`answer-${answer.id}`}
                             value={answer.answer}
-                            onChange={(e) => onAnswerChange(answer.id, e.target.value)}
+                            onChange={(e) => onAnswerChange(id, answer.id, e.target.value)}
                         />
                       </div>
                     </div>

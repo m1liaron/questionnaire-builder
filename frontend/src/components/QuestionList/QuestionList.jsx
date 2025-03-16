@@ -137,7 +137,7 @@ const QuestionList = () => {
                         ...q,
                         answers: [
                             ...q.answers,
-                            { id: newAnswerId, answer: "", isCorrect: false },
+                            { id: newAnswerId, answer: "Answer", isCorrect: false },
                         ],
                     };
                 }
@@ -146,9 +146,17 @@ const QuestionList = () => {
         }));
     };
 
-      const validateQuizData = () => {
-          const questionsValues = Object.values(questions);
-          const answersValues = Object.values(answers);
+    const onChangeTitle = (value) => {
+        setQuiz(prev => ({ ...prev, name: value }));
+    }
+
+    const onChangeDescription = (value) => {
+        setQuiz(prev => ({ ...prev, description: value }));
+    }
+
+  const validateQuizData = () => {
+          const questionsValues = Object.values(quiz.questions);
+          const answersValues = Object.values(quiz.answers);
           for(let question of questionsValues) {
               if(question.includes('Question') || !question.length) {
                   return console.error(`Template question has not been changed: ${question}`)
@@ -162,12 +170,24 @@ const QuestionList = () => {
           }
       }
 
+  const createQuiz = () => {
+        console.log(quiz)
+  }
+
     return (
-        <form>
-            <div className="d-flex gap-3">
-                <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
-                <button type="button" className="btn btn-success" onClick={handleAddQuestion}>Create Quiz</button>
+        <div>
+            <div className="mb-5">
+                <div className="mb-3">
+                    <label htmlFor="exampleInputEmail1" className="form-label">Title</label>
+                    <input type="text" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => onChangeTitle(e.target.value)} value={quiz.name}/>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="exampleInputEmail1" className="form-label">Description</label>
+                    <input type="text" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => onChangeDescription(e.target.value)} value={quiz.description}/>
+                </div>
+                <button type="submit" className="btn btn-success" onClick={createQuiz}>Create Quiz</button>
             </div>
+            <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
             <div>
                 {quiz.questions.map((q, index) => (
                     <QuestionItem
@@ -185,7 +205,7 @@ const QuestionList = () => {
                     />
                 ))}
             </div>
-        </form>
+        </div>
     )
 }
 
