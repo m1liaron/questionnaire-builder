@@ -1,91 +1,136 @@
 import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
-import axios from "axios";
-import {apiUrl} from "../../api/apiUrl.js";
 
 const QuestionList = () => {
-    const [questions, setQuestions] = useState([{
-        id: 1,
-        question: 'Question 1',
-        type: 'Text'
-    }]);
-    const [answers, setAnswers] = useState([]);
+    const [quiz, setQuiz] = useState({
+        name: "",
+        description: "",
+        questions: [
+            {
+                id: 1,
+                text: "Question 1",
+                type: "Text",
+                answers: []
+            }
+        ]
+    });
 
     const generateNewId = (items) => {
         return items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
       };
 
       const handleAddQuestion = () => {
-        const newQuestionId = generateNewId(questions);
-        const newAnswerId = generateNewId(answers);
-        setQuestions((prev) => [
-          ...prev,
-          {
-            id: newQuestionId,
-            question: `Question ${newQuestionId}`,
-            type: "Text"
-          }
-        ]);
-        setAnswers((prev) => [
-          ...prev,
-          {
-            id: newAnswerId,
-            questionId: newQuestionId,
-            answer: "",
-            isCorrect: false
-          }
-        ]);
+        const newQuestionId = generateNewId(quiz.questions);
+          const newQuestion = {
+              id: newQuestionId,
+              text: `Question ${newQuestionId}`,
+              type: "Text",
+              answers: [
+                  { id: 1, answer: "", isCorrect: false } // initialize with one answer
+              ]
+          };
+          setQuiz((prev) => ({
+              ...prev,
+              questions: [...prev.questions, newQuestion],
+          }));
       };
 
-      const handleRemoveQuestion = (id) => {
-        setQuestions((prev) => prev.filter((q) => q.id !== id));
-        setAnswers((prev) => prev.filter((a) => a.questionId !== id));
-      };
-    
-      const handleQuestionChange = (id, newText) => {
-        setQuestions((prev) =>
-          prev.map((q) => (q.id === id ? { ...q, question: newText } : q))
-        );
-      };
-    
-      const handleAnswerChange = (answerId, newText) => {
-        setAnswers((prev) =>
-          prev.map((a) => (a.id === answerId ? { ...a, answer: newText } : a))
-        );
+      const handleRemoveQuestion = (questionId) => {
+          setQuiz((prev) => ({
+              ...prev,
+              questions: prev.questions.filter((q) => q.id !== questionId)
+          }))
       };
 
-      const handleTypeChange = (questionId, newType) => {
-        setQuestions(questions.map(q => q.id === questionId ? { ...q, type: newType } : q));
+    const handleQuestionChange = (questionId, newText) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) =>
+                q.id === questionId ? { ...q, text: newText } : q
+            ),
+        }));
+    };
+
+    const handleAnswerChange = (questionId, answerId, newText) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) =>
+                q.id === questionId
+                    ? {
+                        ...q,
+                        answers: q.answers.map((a) =>
+                            a.id === answerId ? { ...a, answer: newText } : a
+                        ),
+                    }
+                    : q
+            ),
+        }));
+    };
+
+    const handleTypeChange = (questionId, newType) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) =>
+                q.id === questionId ? { ...q, type: newType } : q
+            ),
+        }));
+
         if(newType === "Text") {
-            setAnswers((prev) => {
-                const related = prev.filter(a => a.questionId === questionId);
-                const keep = related.slice(0,1);
-                return [...prev.filter((a => a.questionId !== questionId)), ...keep]
-            })
+            setQuiz((prev) => ({
+                ...prev,
+                questions: prev.questions.map((q) => {
+                    if(q.id === questionId) {
+                        return { ...q, answers: q.answers.slice(0,1)}
+                    }
+                    return q;
+                })
+            }))
         }
-     }    
+     }
 
-     const handleToggleCorrectAnswer = (questionId, answerId, mode) => {
-        if (mode === "single") {
-          // For single choice, mark only the chosen answer as correct.
-          setAnswers(answers.map(a =>
-            a.questionId === questionId ? { ...a, isCorrect: a.id === answerId } : a
-          ));
-        } else {
-          // For multiple choices, toggle the isCorrect value.
-          setAnswers(answers.map(a =>
-            a.id === answerId ? { ...a, isCorrect: !a.isCorrect } : a
-          ));
-        }
-      };
+    const handleToggleCorrectAnswer = (questionId, answerId, mode) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) => {
+                if (q.id === questionId) {
+                    let updatedAnswers;
+                    if (mode === "single") {
+                        // For single choice, mark only the chosen answer as correct.
+                        updatedAnswers = q.answers.map((a) => ({
+                            ...a,
+                            isCorrect: a.id === answerId,
+                        }));
+                    } else {
+                        // For multiple choices, toggle the isCorrect value.
+                        updatedAnswers = q.answers.map((a) =>
+                            a.id === answerId ? { ...a, isCorrect: !a.isCorrect } : a
+                        );
+                    }
+                    return { ...q, answers: updatedAnswers };
+                }
+                return q;
+            }),
+        }));
+    };
 
-      const handleAddAnswer = (questionId) => {
-        const currentAnswers = answers.filter(a => a.questionId === questionId);
-        if (currentAnswers.length < 5) {
-          const newAnswerId = generateNewId(answers);
-          setAnswers([...answers, { id: newAnswerId, questionId, answer: "", isCorrect: false }]);
-        }
-      };
+    const handleAddAnswer = (questionId) => {
+        setQuiz((prev) => ({
+            ...prev,
+            questions: prev.questions.map((q) => {
+                if (q.id === questionId && q.answers.length < 5) {
+                    const newAnswerId = generateNewId(q.answers);
+                    return {
+                        ...q,
+                        answers: [
+                            ...q.answers,
+                            { id: newAnswerId, answer: "", isCorrect: false },
+                        ],
+                    };
+                }
+                return q;
+            }),
+        }));
+    };
 
       const validateQuizData = () => {
           const questionsValues = Object.values(questions);
@@ -110,12 +155,12 @@ const QuestionList = () => {
                 <button type="button" className="btn btn-success" onClick={handleAddQuestion}>Create Quiz</button>
             </div>
             <div>
-                {questions.map((q, index) => (
+                {quiz.questions.map((q, index) => (
                     <QuestionItem
                         key={q.id}
                         question={q}
                         index={index}
-                        answers={answers.filter(a => a.questionId === q.id)}
+                        answers={q.answers}
                         onRemoveQuestion={handleRemoveQuestion}
                         onQuestionChange={handleQuestionChange}
                         onTypeChange={handleTypeChange}

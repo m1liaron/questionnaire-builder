@@ -1,11 +1,43 @@
-import { Quiz } from "../models/models.js";
+import {Answer, Question, Quiz} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
-const createQuiz = async (req, res) => {
-	try {
-		const createdQuiz = await Quiz.create(req.body);
+/**
+ * quizData {object} name, description
+ * questions {array} of {object} with id, question, type
+ * answers {array} of {object} with id, answer, isRight
+ * @returns {Promise<void>}
+ */
 
-		res.status(StatusCodes.CREATED).json(createdQuiz);
+const createQuiz = async (req, res) => {
+	const { quizData, questions, answers } = req.body;
+	try {
+		const createdQuiz = await Quiz.create(quizData);
+		await Promise.all(
+			questions.map(async ({ id, question, type }) => {
+				await Question.create({
+					id,
+					text: question,
+					quizId: createdQuiz.id,
+					type
+				});
+
+				answers.map(async ({id, answer, isRight }) => {
+					await Answer.create({
+						id, answer, isRight, questionId: question.id
+					})
+				})
+		}));
+
+		const foundQuiz = await Quiz.findOne({
+			where: { id: createdQuiz.id},
+			include: [{
+				model: Question,
+				as: "questions",
+				include: [{ model: Answer, as: "answers" }]
+			}]
+		});
+
+		res.status(StatusCodes.CREATED).json(foundQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
