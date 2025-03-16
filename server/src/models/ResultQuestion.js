@@ -1,23 +1,22 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
-import { Question } from "./models.js";
+import { Answer, Question, Result } from "./models.js";
 
-const Answer = sequelize.define(
-	"Answer",
+const ResultQuestion = sequelize.define(
+	"ResultQuestion",
 	{
 		id: {
 			type: DataTypes.UUID,
 			defaultValue: DataTypes.UUIDV4,
 			primaryKey: true,
 		},
-		answer: {
-			type: DataTypes.STRING,
+		resultId: {
+			type: DataTypes.UUID,
 			allowNull: false,
-		},
-		isRight: {
-			type: DataTypes.BOOLEAN,
-			allowNull: false,
-			defaultValue: false,
+			references: {
+				model: Result,
+				key: "id",
+			},
 		},
 		questionId: {
 			type: DataTypes.UUID,
@@ -27,10 +26,18 @@ const Answer = sequelize.define(
 				key: "id",
 			},
 		},
+		answerId: {
+			type: DataTypes.UUID,
+			allowNull: false,
+			references: {
+				model: Answer,
+				key: "id",
+			},
+		},
 	},
 	{
 		timestamps: true,
 	},
 );
 
-export { Answer };
+export { ResultQuestion };
