@@ -2,6 +2,8 @@ import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
 import ToastContext from "react-bootstrap/ToastContext";
 import {toast, ToastContainer} from "react-toastify";
+import axios from "axios";
+import {apiUrl} from "../../api/apiUrl.js";
 
 const QuestionList = () => {
     const [quiz, setQuiz] = useState({
@@ -195,9 +197,10 @@ const QuestionList = () => {
     };
 
 
-  const createQuiz = () => {
+  const createQuiz = async () => {
         validateQuizData();
-        console.log(quiz)
+        const response = await  axios.post(`${apiUrl}/quizzes`, {quiz});
+        console.log(response);
   }
 
     return (

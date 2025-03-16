@@ -14,7 +14,7 @@ const Answer = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 		},
-		isRight: {
+		isCorrect: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
 			defaultValue: false,
@@ -26,6 +26,11 @@ const Answer = sequelize.define(
 				model: Question,
 				key: "id",
 			},
+			validate: {
+				notEmpty: {
+					msg: "QuestionId must be not empty"
+				}
+			}
 		},
 	},
 	{

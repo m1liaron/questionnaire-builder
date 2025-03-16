@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 
+import {createQuizValidateMiddleware} from "../middlewares/createQuiz.validate.middleware.js";
 import {
 	getQuiz,
 	getQuizzes,
@@ -9,7 +10,8 @@ import {
 	removeQuiz,
 } from "../controllers/quizController.js";
 
-router.route("/").post(createQuiz).get(getQuizzes);
+router.post("/", createQuizValidateMiddleware, createQuiz);
+router.route("/").get(getQuizzes);
 router.route("/:id").get(getQuiz).patch(updateQuiz).delete(removeQuiz);
 
 export { router as quizRoute };

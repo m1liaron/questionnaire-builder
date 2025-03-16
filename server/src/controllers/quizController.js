@@ -9,23 +9,28 @@ import { StatusCodes } from "http-status-codes";
  */
 
 const createQuiz = async (req, res) => {
-	const { quizData, questions, answers } = req.body;
+	const { quiz } = req.body;
 	try {
-		const createdQuiz = await Quiz.create(quizData);
+		const createdQuiz = await Quiz.create({ name: quiz.name, description: quiz.description });
 		await Promise.all(
-			questions.map(async ({ id, question, type }) => {
-				await Question.create({
-					id,
-					text: question,
+			quiz.questions.map(async ({ text, type, answers }) => {
+				const createdQuestion = await Question.create({
+					text,
 					quizId: createdQuiz.id,
-					type
+					type,
 				});
 
-				answers.map(async ({id, answer, isRight }) => {
-					await Answer.create({
-						id, answer, isRight, questionId: question.id
-					})
-				})
+				if(Array.isArray(answers)) {
+					await Promise.all(
+						answers.map(async ({ answer, isCorrect }) => {
+							await Answer.create({
+								answer,
+								isCorrect,
+								questionId: createdQuestion.id
+							})
+						})
+					)
+				}
 		}));
 
 		const foundQuiz = await Quiz.findOne({

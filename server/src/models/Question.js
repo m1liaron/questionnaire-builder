@@ -21,11 +21,21 @@ const Question = sequelize.define(
 				model: Quiz,
 				key: "id",
 			},
+			validate: {
+				notEmpty: {
+					msg: "Quiz id must be not empty"
+				}
+			}
 		},
 		type: {
 			type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices"),
 			allowNull: false,
 			defaultValue: "Text",
+			validate: {
+				notEmpty: {
+					msg: "Type Must be not empty"
+				}
+			}
 		},
 	},
 	{
