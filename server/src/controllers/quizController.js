@@ -23,6 +23,21 @@ const getQuiz = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
     }
 }
+const getQuizzes = async (req, res) => {
+    try{
+        const { quizId } = req.params;
+        const findQuestionnaire = await Quiz.findAll({
+            where: { id: quizId }
+        });
+        if(!findQuestionnaire) {
+            return res.status(StatusCodes.NOT_FOUND).json({ error: true, message: 'Questionnaire Not Found' });
+        }
+
+        res.status(StatusCodes.OK).json(findQuestionnaire);
+    } catch (error) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
+    }
+}
 const updateQuiz = async (req, res) => {
     try{
         const { quizId } = req.params;
@@ -55,6 +70,7 @@ const removeQuiz = async (req, res) => {
 export {
     createQuiz,
     getQuiz,
+    getQuizzes,
     updateQuiz,
     removeQuiz
 }
