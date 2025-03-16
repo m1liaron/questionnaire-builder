@@ -1,6 +1,8 @@
 import { Quiz } from "./Quiz.js";
 import { Question } from "./Question.js";
 import { Answer } from "./Answer.js";
+import { Result } from "./Result.js";
+import { ResultQuestion } from "./ResultQuestions.js";
 
 // Questionnaire - Question
 Quiz.hasMany(Question, { as: "questions", foreignKey: "quizId" });
