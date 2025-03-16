@@ -1,32 +1,32 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
-import { Questionnaire } from "./models.js";
+import { Question } from "./models.js";
 
-const Question = sequelize.define("Question", {
+const Answer = sequelize.define("Question", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
-    text: {
+    answer: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    quizId: {
+    isRight: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    questionId: {
         type: DataTypes.UUID,
         allowNull: false,
         references: {
-            model: Questionnaire,
+            model: Question,
             key: 'id',
         }
-    },
-    type: {
-        type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices"),
-        allowNull: false,
-        defaultValue: "Text",
     }
 }, {
     timestamps: true
 });
 
-export { Question };
+export { Answer };
