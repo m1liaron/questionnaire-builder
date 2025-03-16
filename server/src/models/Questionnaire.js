@@ -27,6 +27,8 @@ const Questionnaire = sequelize.define("Questionnaire", {
         type: DataTypes.INTEGER,
         allowNull: false,
     }
+}, {
+    timestamps: true
 });
 
 export { Questionnaire };
