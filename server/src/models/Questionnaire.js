@@ -13,7 +13,8 @@ const Questionnaire = sequelize.define("Questionnaire", {
         validate: {
             notEmpty: true,
             message: "Name is required",
-        }
+        },
+        unique: true,
     },
     description: {
         type: DataTypes.STRING,
