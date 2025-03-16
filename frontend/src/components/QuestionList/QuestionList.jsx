@@ -1,5 +1,7 @@
 import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
+import axios from "axios";
+import {apiUrl} from "../../api/apiUrl.js";
 
 const QuestionList = () => {
     const [questions, setQuestions] = useState([{
@@ -84,7 +86,23 @@ const QuestionList = () => {
           setAnswers([...answers, { id: newAnswerId, questionId, answer: "", isCorrect: false }]);
         }
       };
-    
+
+      const validateQuizData = () => {
+          const questionsValues = Object.values(questions);
+          const answersValues = Object.values(answers);
+          for(let question of questionsValues) {
+              if(question.includes('Question') || !question.length) {
+                  return console.error(`Template question has not been changed: ${question}`)
+              }
+          }
+
+          for(let answer of answersValues) {
+              if(answer.includes('Answer') || !answer.length) {
+                  return console.error(`Template answer has not been changed: ${answer}`)
+              }
+          }
+      }
+
     return (
         <form>
             <div className="d-flex gap-3">

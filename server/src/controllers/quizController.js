@@ -2,7 +2,6 @@ import { Quiz } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
 const createQuiz = async (req, res) => {
-	console.log(req.body)
 	try {
 		const createdQuiz = await Quiz.create(req.body);
 
