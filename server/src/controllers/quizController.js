@@ -1,19 +1,19 @@
-import {Questionnaire} from "../models/models.js";
+import {Quiz} from "../models/models.js";
 import {StatusCodes} from "http-status-codes";
 
-const createQuestionnaire = async (req, res) => {
+const createQuiz = async (req, res) => {
     try{
-        const existingQuestionnaire = await Questionnaire.create(req.body);
+        const existingQuestionnaire = await Quiz.create(req.body);
 
         res.status(StatusCodes.CREATED).send(existingQuestionnaire);
     } catch (error) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
     }
 }
-const getQuestionnaire = async (req, res) => {
+const getQuiz = async (req, res) => {
     try{
         const { quizId } = req.params;
-        const findQuestionnaire = await Questionnaire.findByPk(quizId);
+        const findQuestionnaire = await Quiz.findByPk(quizId);
         if(!findQuestionnaire) {
             return res.status(StatusCodes.NOT_FOUND).json({ error: true, message: 'Questionnaire Not Found' });
         }
@@ -23,10 +23,10 @@ const getQuestionnaire = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
     }
 }
-const updateQuestionnaire = async (req, res) => {
+const updateQuiz = async (req, res) => {
     try{
         const { quizId } = req.params;
-        const updatedQuestionnaire = await Questionnaire.update(req.body, {
+        const updatedQuestionnaire = await Quiz.update(req.body, {
             where: { id: quizId },
             returning: true
         });
@@ -38,10 +38,10 @@ const updateQuestionnaire = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message})
     }
 }
-const removeQuestionnaire = async (req, res) => {
+const removeQuiz = async (req, res) => {
     try{
         const { quizId } = req.params;
-        const findQuestionnaire = await Questionnaire.findByPk(quizId);
+        const findQuestionnaire = await Quiz.findByPk(quizId);
         if(!findQuestionnaire) {
             return res.status(StatusCodes.NOT_FOUND).json({ error: true, message: 'Questionnaire Not Found' });
         }
@@ -52,10 +52,9 @@ const removeQuestionnaire = async (req, res) => {
     }
 }
 
-
 export {
-    createQuestionnaire,
-    getQuestionnaire,
-    updateQuestionnaire,
-    removeQuestionnaire
+    createQuiz,
+    getQuiz,
+    updateQuiz,
+    removeQuiz
 }

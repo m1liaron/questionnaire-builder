@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
 
-const Questionnaire = sequelize.define("Questionnaire", {
+const Quiz = sequelize.define("Questionnaire", {
     id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
@@ -32,4 +32,4 @@ const Questionnaire = sequelize.define("Questionnaire", {
     timestamps: true
 });
 
-export { Questionnaire };
+export { Quiz };
