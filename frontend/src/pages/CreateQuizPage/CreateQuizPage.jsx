@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
 import { QuizForm } from "../../components/QuizForm/QuizForm.jsx";
 import axios from "axios";
-import {apiUrl} from "../../api/apiUrl.js";
+import {apiUrl} from "../../common/enums/apiUrl.js";
 import {useNavigate} from "react-router-dom";
 
 const CreateQuizPage = () => {

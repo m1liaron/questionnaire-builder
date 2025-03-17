@@ -84,41 +84,36 @@ const getQuiz = async (req, res) => {
 };
 const getQuizzes = async (req, res) => {
 	try {
+		const { sort = "name", order = "ASC" } = req.query;
+		const orderDirection = order.toUpperCase() === "DESC" ? -1 : 1;
+
 		const foundQuizzes = await Quiz.findAll({
 			include: [
-				{
-					model: Question,
-					as: "questions",
-					attributes: ["id"],
-				},
-				{
-					model: Result,
-					as: "results",
-					attributes: ["id"],
-				},
+				{ model: Question, as: "questions", attributes: ["id"] },
+				{ model: Result, as: "results", attributes: ["id"] }
 			],
+			order: [["createdAt", "DESC"]] // Default sorting in DB
 		});
-		if (!foundQuizzes || !foundQuizzes.length) {
-			return res.status(StatusCodes.OK).json([]);
+
+		const quizzesWithCount = foundQuizzes.map((quiz) => ({
+			...quiz.toJSON(),
+			questionsAmount: quiz.questions?.length || 0,
+			amountOfCompletions: quiz.results?.length || 0
+		}));
+
+		// Handle sorting dynamically for computed fields
+		if (["questionsAmount", "amountOfCompletions"].includes(sort)) {
+			quizzesWithCount.sort((a, b) => (a[sort] - b[sort]) * orderDirection);
+		} else {
+			quizzesWithCount.sort((a, b) => a[sort].localeCompare(b[sort]) * orderDirection);
 		}
 
-		const quizzesWithCount = foundQuizzes.map((quiz) => {
-			const quizObj = quiz.toJSON();
-			quizObj.questionsAmount = quizObj.questions
-				? quizObj.questions.length
-				: 0;
-			quizObj.amountOfCompletions = quizObj.results
-				? quizObj.results.length
-				: 0;
-			return quizObj;
-		});
-		res.status(StatusCodes.OK).json(quizzesWithCount);
+		res.status(200).json(quizzesWithCount);
 	} catch (error) {
-		res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ error: true, message: error.message });
+		res.status(500).json({ error: true, message: error.message });
 	}
 };
+
 const updateQuiz = async (req, res) => {
 	const { quizId } = req.params;
 	const {

@@ -1,7 +1,7 @@
 import {Button, Form, InputGroup, ListGroup} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {apiUrl} from "../../api/apiUrl.js";
+import {apiUrl} from "../../common/enums/apiUrl.js";
 import {useNavigate, useParams} from "react-router-dom";
 import {FaArrowLeft, FaArrowRight} from "react-icons/fa";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";

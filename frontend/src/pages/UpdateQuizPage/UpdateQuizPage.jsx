@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import { BackButton } from "../../components/common/BackButton/BackButton"
 import { useEffect, useState } from "react";
-import { apiUrl } from "../../api/apiUrl";
+import { apiUrl } from "../../common/enums/apiUrl.js";
 import { QuizForm } from "../../components/QuizForm/QuizForm";
 import axios from "axios";
 

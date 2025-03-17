@@ -1,19 +1,9 @@
-    import {useEffect, useState} from "react";
 import {QuizItem} from "../QuizItem/QuizItem.jsx";
 import axios from "axios";
-import {apiUrl} from "../../api/apiUrl.js";
+import {apiUrl} from "../../common/enums/apiUrl.js";
 import {toast, ToastContainer} from "react-toastify";
 
-const QuizList = () => {
-    const [quizzes, setQuizzes] = useState();
-
-    useEffect(() => {
-        const getQuizzes = async () => {
-            const response = await axios.get(`${apiUrl}/quizzes`);
-            setQuizzes(response.data);
-        }
-        getQuizzes();
-    }, []);
+const QuizList = ({ quizzes, setQuizzes }) => {
 
     const handleRemoveQuiz = async (id) => {
         const response = await axios.delete(`${apiUrl}/quizzes/${id}`);
