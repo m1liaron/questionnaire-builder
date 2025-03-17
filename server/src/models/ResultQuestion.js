@@ -28,12 +28,20 @@ const ResultQuestion = sequelize.define(
 		},
 		answerId: {
 			type: DataTypes.UUID,
-			allowNull: false,
+			allowNull: true,
 			references: {
 				model: Answer,
 				key: "id",
 			},
 		},
+		userAnswer: {
+			type: DataTypes.TEXT || DataTypes.ARRAY,
+			allowNull: false,
+		},
+		isAnswerCorrect: {
+			type: DataTypes.BOOLEAN,
+			allowNull: false,
+		}
 	},
 	{
 		timestamps: true,

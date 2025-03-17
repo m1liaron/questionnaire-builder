@@ -3,14 +3,16 @@ import { StatusCodes } from "http-status-codes";
 
 const createResult = async (req, res) => {
 	try {
-		const result = await Result.create({});
+		const result = await Result.create({ quizId: req.body.quizId});
 
 		const resultQuestions = await Promise.all(
-			[...req.body].map(({ questionId, answerId }) => {
+			[...req.body.questions].map(({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
 				ResultQuestion.create({
 					resultId: result.id,
 					questionId,
 					answerId,
+					userAnswer,
+					isAnswerCorrect
 				});
 			}),
 		);

@@ -52,20 +52,20 @@ const createQuiz = async (req, res) => {
 const getQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findByPk(quizId, {
+		const findQuiz = await Quiz.findByPk(quizId, {
 			include: [{
 				model: Question,
 				as: "questions",
 				include: [{ model: Answer, as: "answers" }]
 			}]
 		});
-		if (!findQuestionnaire) {
+		if (!findQuiz) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ error: true, message: "Questionnaire Not Found" });
 		}
 
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+		res.status(StatusCodes.OK).json(findQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
