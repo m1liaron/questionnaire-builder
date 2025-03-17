@@ -1,17 +1,6 @@
 import { Question } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
-const createQuestion = async (req, res) => {
-	try {
-		const existingQuestion = await Question.create(req.body);
-
-		res.status(StatusCodes.CREATED).send(existingQuestion);
-	} catch (error) {
-		res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ error: true, message: error.message });
-	}
-};
 const getQuestions = async (req, res) => {
 	try {
 		const { questionId } = req.params;
@@ -68,4 +57,4 @@ const removeQuestion = async (req, res) => {
 	}
 };
 
-export { createQuestion, getQuestions, updateQuestion, removeQuestion };
+export { getQuestions, updateQuestion, removeQuestion };

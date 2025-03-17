@@ -18,7 +18,9 @@ const Quiz = sequelize.define(
 					msg: "Name is required",
 				},
 			},
-			unique: true,
+			unique: {
+				msg: "Name is already exist",
+			},
 		},
 		description: {
 			type: DataTypes.STRING,
