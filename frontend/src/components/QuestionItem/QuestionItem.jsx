@@ -1,5 +1,7 @@
 import { FaTrash } from "react-icons/fa";
 import {Button} from "react-bootstrap";
+import { useSortable} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const QuestionItem = ({
   question,
@@ -11,12 +13,30 @@ const QuestionItem = ({
   onTypeChange,
   onAnswerChange,
   onToggleCorrectAnswer,
-  onAddAnswer
+  onAddAnswer,
 }) => {
   const { id, text, type } = question;
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    border: "1px solid #ccc",
+    padding: "1rem",
+    marginBottom: "1rem",
+    background: "#fff",
+  };
 
   return (
-    <div className="border border-2 m-2 p-2">
+    <div className="border border-2 m-2 p-2" ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div className="d-flex align-items-center gap-5">
         <span>{index + 1}</span>
         <div className="d-flex align-items-center gap-3">
@@ -60,40 +80,40 @@ const QuestionItem = ({
                     Add Answer
                   </Button>
               )}
-              {type !== "Text" && answers.map((answer, idx) => (
-                  <li key={answer.id} className="list-group-item d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center gap-3">
-                      {type === "Single Choice" && (
-                          <input
-                              type="radio"
-                              name={`correct-${id}`}
-                              checked={answer.isCorrect || false}
-                              onChange={() => onToggleCorrectAnswer(id, answer.id, "single")}
-                          />
-                      )}
-                      {type === "Multiple Choices" && (
-                          <input
-                              type="checkbox"
-                              checked={answer.isCorrect || false}
-                              onChange={() => onToggleCorrectAnswer(id, answer.id, "multiple")}
-                          />
-                      )}
-                      <div>
-                        <label htmlFor={`answer-${answer.id}`} className="form-label">
-                          Choice {idx + 1}
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id={`answer-${answer.id}`}
-                            value={answer.answer}
-                            onChange={(e) => onAnswerChange(id, answer.id, e.target.value)}
-                        />
-                      </div>
-                    </div>
-                    <FaTrash size={30} color="red" cursor="pointer" onClick={() => onRemoveAnswer(answer.id, id)} />
-                  </li>
-              ))}
+                  {type !== "Text" && answers.map((answer, idx) => (
+                      <li key={answer.id} className="list-group-item d-flex justify-content-between align-items-center">
+                        <div className="d-flex align-items-center gap-3">
+                          {type === "Single Choice" && (
+                              <input
+                                  type="radio"
+                                  name={`correct-${id}`}
+                                  checked={answer.isCorrect || false}
+                                  onChange={() => onToggleCorrectAnswer(id, answer.id, "single")}
+                              />
+                          )}
+                          {type === "Multiple Choices" && (
+                              <input
+                                  type="checkbox"
+                                  checked={answer.isCorrect || false}
+                                  onChange={() => onToggleCorrectAnswer(id, answer.id, "multiple")}
+                              />
+                          )}
+                          <div>
+                            <label htmlFor={`answer-${answer.id}`} className="form-label">
+                              Choice {idx + 1}
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id={`answer-${answer.id}`}
+                                value={answer.answer}
+                                onChange={(e) => onAnswerChange(id, answer.id, e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <FaTrash size={30} color="red" cursor="pointer" onClick={() => onRemoveAnswer(answer.id, id)} />
+                      </li>
+                  ))}
             </ul>
           </div>
       )}

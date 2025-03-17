@@ -1,10 +1,41 @@
 import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
 import {toast, ToastContainer} from "react-toastify";
-
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors
+} from "@dnd-kit/core";
+import {
+    SortableContext,
+    verticalListSortingStrategy,
+    arrayMove
+} from "@dnd-kit/sortable";
 
 const QuizForm = ({ initialQuiz, onSubmit, submitButtonText }) => {
     const [quiz, setQuiz] = useState(initialQuiz);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: { distance: 10 }
+        })
+    );
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        if(!over || active.id === over.id) return;
+
+        const oldIndex = quiz.questions.findIndex(q => q.id === active.id);
+        const newIndex = quiz.questions.findIndex(q => q.id === over.id);
+
+        setQuiz(prev => ({
+            ...prev,
+            questions: arrayMove(prev.questions, oldIndex, newIndex)
+        }))
+    }
 
     const generateNewId = (items) => {
         return items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
@@ -203,23 +234,25 @@ const QuizForm = ({ initialQuiz, onSubmit, submitButtonText }) => {
                 <button type="submit" className="btn btn-success" onClick={handleSubmit}>{submitButtonText}</button>
             </div>
             <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
-            <div>
-                {quiz.questions.map((q, index) => (
-                    <QuestionItem
-                        key={q.id}
-                        question={q}
-                        index={index}
-                        answers={q.answers}
-                        onRemoveQuestion={handleRemoveQuestion}
-                        onRemoveAnswer={handleRemoveAnswer}
-                        onQuestionChange={handleQuestionChange}
-                        onTypeChange={handleTypeChange}
-                        onAnswerChange={handleAnswerChange}
-                        onToggleCorrectAnswer={handleToggleCorrectAnswer}
-                        onAddAnswer={handleAddAnswer}
-                    />
-                ))}
-            </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <SortableContext items={quiz.questions.map(q => q.id)} strategy={verticalListSortingStrategy}>
+                    {quiz.questions.map((q, index) => (
+                        <QuestionItem
+                            key={q.id}
+                            question={q}
+                            index={index}
+                            answers={q.answers}
+                            onRemoveQuestion={handleRemoveQuestion}
+                            onRemoveAnswer={handleRemoveAnswer}
+                            onQuestionChange={handleQuestionChange}
+                            onTypeChange={handleTypeChange}
+                            onAnswerChange={handleAnswerChange}
+                            onToggleCorrectAnswer={handleToggleCorrectAnswer}
+                            onAddAnswer={handleAddAnswer}
+                        />
+                    ))}
+                </SortableContext>
+            </DndContext>
         </div>
     )
 }
