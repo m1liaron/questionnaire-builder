@@ -12,7 +12,7 @@ function App() {
         <Routes>
             <Route path={AppPath.HomePage} element={<HomePage/>}/>
             <Route path={AppPath.QuizPage} element={<QuizPage/>}/>
-            <Route path={AppPath.CreateQUiz} element={<CreateQuizPage/>}/>
+            <Route path={AppPath.CreateQuiz} element={<CreateQuizPage/>}/>
         </Routes>
     </BrowserRouter>
   )

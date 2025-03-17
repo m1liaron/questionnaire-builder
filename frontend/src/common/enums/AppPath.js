@@ -2,7 +2,9 @@
 const AppPath = {
     HomePage: "/",
     QuizPage: "/quiz:quizId",
-    CreateQUiz: "/create-quiz"
+    CreateQuiz: "/create-quiz",
+    RunQuizPage: "/:quizId/run-quiz",
+    UpdateQuizPage: "/:quizId/update-quiz",
 }
 
 export { AppPath };
