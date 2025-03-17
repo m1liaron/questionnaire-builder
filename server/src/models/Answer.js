@@ -30,7 +30,8 @@ const Answer = sequelize.define(
 				notEmpty: {
 					msg: "QuestionId must be not empty"
 				}
-			}
+			},
+			onDelete: "CASCADE"
 		},
 	},
 	{

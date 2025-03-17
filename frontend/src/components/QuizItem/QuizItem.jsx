@@ -20,12 +20,12 @@ const QuizItem = ({ id, name, description, questionsAmount = 1, onRemoveQuiz }) 
 
     return (
         <>
-            <div className="border border-3 p-3 " style={{minWidth: "400px"}}>
+            <div className="border border-3 p-3 " style={{minWidth: "400px", maxWidth: "600px"}}>
                 <div className="d-flex justify-content-between align-items-center">
-                    <h3>{name}</h3>
-                    <BsThreeDotsVertical cursor="pointer" onClick={() => setShowActionsModal(!showActionsModal)}/>
+                    <h3 style={{ lineBreak: "anywhere"}}>{name}</h3>
+                    <BsThreeDotsVertical cursor="pointer" size={30} onClick={() => setShowActionsModal(!showActionsModal)}/>
                 </div>
-                <p>{description}</p>
+                <p style={{ lineBreak: "anywhere"}}>{description}</p>
 
                 <p>Questions: {questionsAmount}</p>
             </div>

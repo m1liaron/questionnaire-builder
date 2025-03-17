@@ -115,14 +115,28 @@ const updateQuiz = async (req, res) => {
 const removeQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
-		const findQuiz = await Quiz.findByPk(quizId);
+		const findQuiz = await Quiz.findByPk(quizId, {
+			include: {
+				model: Question,
+				as: "questions",
+				include: [{ model: Answer, as: "answers" }]
+			}
+		});
 		if (!findQuiz) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ error: true, message: "Quiz Not Found" });
 		}
+
+		await Promise.all(
+			findQuiz.questions.flatMap((question) =>
+				question.answers.map((answer) => answer.destroy())
+			)
+		);
+
+		await Promise.all(findQuiz.questions.map((question) => question.destroy()));
 		await findQuiz.destroy();
-		res.status(StatusCodes.OK).json(findQuiz);
+		res.status(StatusCodes.OK).json(quizId);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
