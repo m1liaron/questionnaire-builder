@@ -6,8 +6,8 @@ const createResult = async (req, res) => {
 		const result = await Result.create({ quizId: req.body.quizId});
 
 		const resultQuestions = await Promise.all(
-			[...req.body.questions].map(({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
-				ResultQuestion.create({
+			[...req.body.questions].map(async ({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
+				return await ResultQuestion.create({
 					resultId: result.id,
 					questionId,
 					answerId,
