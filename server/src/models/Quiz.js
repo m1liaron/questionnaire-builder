@@ -13,26 +13,25 @@ const Quiz = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
+				len: [5,30],
 				notNull: {
 					msg: "Name is required",
 				},
 			},
-			unique: true,
+			unique: {
+				msg: "Name is already exist",
+			},
 		},
 		description: {
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
+				len: [10, 90],
 				notEmpty: {
 					msg: "Description is required",
 				},
 			},
-		},
-		amountOfCompletions: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			defaultValue: 0
-		},
+		}
 	},
 	{
 		timestamps: true,

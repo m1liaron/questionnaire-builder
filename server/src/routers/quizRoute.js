@@ -12,6 +12,6 @@ import {
 
 router.post("/", createQuizValidateMiddleware, createQuiz);
 router.route("/").get(getQuizzes);
-router.route("/:id").get(getQuiz).patch(updateQuiz).delete(removeQuiz);
+router.route("/:quizId").get(getQuiz).patch(updateQuiz).delete(removeQuiz);
 
 export { router as quizRoute };

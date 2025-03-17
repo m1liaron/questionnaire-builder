@@ -1,4 +1,4 @@
-import {Answer, Question, Quiz} from "../models/models.js";
+import {Answer, Question, Quiz, Result} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
 /**
@@ -52,14 +52,20 @@ const createQuiz = async (req, res) => {
 const getQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findByPk(quizId);
-		if (!findQuestionnaire) {
+		const findQuiz = await Quiz.findByPk(quizId, {
+			include: [{
+				model: Question,
+				as: "questions",
+				include: [{ model: Answer, as: "answers" }]
+			}]
+		});
+		if (!findQuiz) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ error: true, message: "Questionnaire Not Found" });
 		}
 
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+		res.status(StatusCodes.OK).json(findQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -69,21 +75,29 @@ const getQuiz = async (req, res) => {
 const getQuizzes = async (req, res) => {
 	try {
 		const foundQuizzes = await Quiz.findAll({
-			include: [{
-				model: Question,
-				as: "questions",
-				attributes: ["id"]
-			}]
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					attributes: ["id"],
+				},
+				{
+					model: Result,
+					as: "results",
+					attributes: ["id"]
+				}
+			],
 		});
 		if (!foundQuizzes || !foundQuizzes.length) {
 			return res
-				.status(StatusCodes.NOT_FOUND)
-				.json({ error: true, message: "Questionnaire Not Found" });
+				.status(StatusCodes.OK)
+				.json([]);
 		}
 
 		const quizzesWithCount = foundQuizzes.map((quiz) => {
 			const quizObj = quiz.toJSON();
 			quizObj.questionsAmount = quizObj.questions ? quizObj.questions.length : 0;
+			quizObj.amountOfCompletions = quizObj.results ? quizObj.results.length : 0
 			return quizObj;
 		});
 		res.status(StatusCodes.OK).json(quizzesWithCount);
@@ -115,14 +129,28 @@ const updateQuiz = async (req, res) => {
 const removeQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findByPk(quizId);
-		if (!findQuestionnaire) {
+		const findQuiz = await Quiz.findByPk(quizId, {
+			include: {
+				model: Question,
+				as: "questions",
+				include: [{ model: Answer, as: "answers" }]
+			}
+		});
+		if (!findQuiz) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
-				.json({ error: true, message: "Questionnaire Not Found" });
+				.json({ error: true, message: "Quiz Not Found" });
 		}
-		await findQuestionnaire.destroy();
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+
+		await Promise.all(
+			findQuiz.questions.flatMap((question) =>
+				question.answers.map((answer) => answer.destroy())
+			)
+		);
+
+		await Promise.all(findQuiz.questions.map((question) => question.destroy()));
+		await findQuiz.destroy();
+		res.status(StatusCodes.OK).json(quizId);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)

@@ -9,8 +9,8 @@ Quiz.hasMany(Question, { as: "questions", foreignKey: "quizId" });
 Question.belongsTo(Quiz, { as: "quiz", foreignKey: "quizId" });
 
 // Question - Answer
-Question.hasMany(Answer, { as: "answers", foreignKey: "quizId" });
-Answer.belongsTo(Question, { as: "answers", foreignKey: "quizId" });
+Question.hasMany(Answer, { as: "answers", foreignKey: "questionId" });
+Answer.belongsTo(Question, { as: "question", foreignKey: "questionId" });
 
 // Result - ResultQuestion
 Result.hasMany(ResultQuestion, {
@@ -18,6 +18,10 @@ Result.hasMany(ResultQuestion, {
 	foreignKey: "resultId",
 });
 ResultQuestion.belongsTo(Result, { as: "result", foreignKey: "resultId" });
+
+// Result - Quiz
+Result.belongsTo(Quiz, { as: "quiz", foreignKey: "quizId" });
+Quiz.hasMany(Result, { as: "results", foreignKey: "quizId" });
 
 // ResultQuestion - Question
 ResultQuestion.belongsTo(Question, {

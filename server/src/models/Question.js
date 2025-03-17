@@ -25,7 +25,8 @@ const Question = sequelize.define(
 				notEmpty: {
 					msg: "Quiz id must be not empty"
 				}
-			}
+			},
+			onDelete: "CASCADE"
 		},
 		type: {
 			type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices"),

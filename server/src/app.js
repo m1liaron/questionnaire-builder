@@ -16,7 +16,7 @@ app.use(cors());
 app.use("/quizzes", quizRoute);
 app.use("/questions", questionRoute);
 app.use("/answers", answerRoute);
-app.use("/results", answerRoute);
+app.use("/results", resultRoute);
 
 const port = process.env.PORT || 3000;
 
