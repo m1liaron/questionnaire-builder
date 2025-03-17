@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
-import {Quiz} from "./Quiz.js";
+import { Quiz } from "./Quiz.js";
 
 const Result = sequelize.define(
 	"Result",
@@ -16,12 +16,12 @@ const Result = sequelize.define(
 			references: {
 				model: Quiz,
 				key: "id",
-			}
+			},
 		},
 		timeSpend: {
 			type: DataTypes.INTEGER,
-			allowNull: false
-		}
+			allowNull: false,
+		},
 	},
 	{
 		timestamps: true,

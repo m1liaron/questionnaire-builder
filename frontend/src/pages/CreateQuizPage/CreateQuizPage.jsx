@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
 import { QuizForm } from "../../components/QuizForm/QuizForm.jsx";
+import axios from "axios";
+import {apiUrl} from "../../api/apiUrl.js";
+import {useNavigate} from "react-router-dom";
 
 const CreateQuizPage = () => {
     const [quiz, setQuiz] = useState({
@@ -15,9 +18,11 @@ const CreateQuizPage = () => {
             }
         ]
     });
+    const navigate = useNavigate();
 
     const createQuiz = async (data) => {
         await  axios.post(`${apiUrl}/quizzes`, data);
+        navigate(-1);
   }
 
     return (

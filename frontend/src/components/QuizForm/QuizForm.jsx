@@ -16,9 +16,7 @@ const QuizForm = ({ initialQuiz, onSubmit, submitButtonText }) => {
               id: newQuestionId,
               text: `Question ${newQuestionId}`,
               type: "Text",
-              answers: [
-                  { id: 1, answer: "", isCorrect: false } // initialize with one answer
-              ]
+              answers: ""
           };
           setQuiz((prev) => ({
               ...prev,

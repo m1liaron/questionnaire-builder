@@ -1,6 +1,6 @@
-import {Answer, Question, Quiz, Result} from "../models/models.js";
+import { Answer, Question, Quiz, Result } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
-import {sequelize} from "../db/sequelize.js";
+import { sequelize } from "../db/sequelize.js";
 
 /**
  * quizData {object} name, description
@@ -12,7 +12,11 @@ import {sequelize} from "../db/sequelize.js";
 const createQuiz = async (req, res) => {
 	const { quiz } = req.body;
 	try {
-		const createdQuiz = await Quiz.create({ name: quiz.name, description: quiz.description });
+		const createdQuiz = await Quiz.create({
+			name: quiz.name,
+			description: quiz.description,
+			questionsAmount: quiz.questionsAmount,
+		});
 		await Promise.all(
 			quiz.questions.map(async ({ text, type, answers }) => {
 				const createdQuestion = await Question.create({
@@ -21,26 +25,29 @@ const createQuiz = async (req, res) => {
 					type,
 				});
 
-				if(Array.isArray(answers)) {
+				if (Array.isArray(answers)) {
 					await Promise.all(
 						answers.map(async ({ answer, isCorrect }) => {
 							await Answer.create({
 								answer,
 								isCorrect,
-								questionId: createdQuestion.id
-							})
-						})
-					)
+								questionId: createdQuestion.id,
+							});
+						}),
+					);
 				}
-		}));
+			}),
+		);
 
 		const foundQuiz = await Quiz.findOne({
-			where: { id: createdQuiz.id},
-			include: [{
-				model: Question,
-				as: "questions",
-				include: [{ model: Answer, as: "answers" }]
-			}]
+			where: { id: createdQuiz.id },
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					include: [{ model: Answer, as: "answers" }],
+				},
+			],
 		});
 
 		res.status(StatusCodes.CREATED).json(foundQuiz);
@@ -54,11 +61,13 @@ const getQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
 		const findQuiz = await Quiz.findByPk(quizId, {
-			include: [{
-				model: Question,
-				as: "questions",
-				include: [{ model: Answer, as: "answers" }]
-			}]
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					include: [{ model: Answer, as: "answers" }],
+				},
+			],
 		});
 		if (!findQuiz) {
 			return res
@@ -85,20 +94,22 @@ const getQuizzes = async (req, res) => {
 				{
 					model: Result,
 					as: "results",
-					attributes: ["id"]
-				}
+					attributes: ["id"],
+				},
 			],
 		});
 		if (!foundQuizzes || !foundQuizzes.length) {
-			return res
-				.status(StatusCodes.OK)
-				.json([]);
+			return res.status(StatusCodes.OK).json([]);
 		}
 
 		const quizzesWithCount = foundQuizzes.map((quiz) => {
 			const quizObj = quiz.toJSON();
-			quizObj.questionsAmount = quizObj.questions ? quizObj.questions.length : 0;
-			quizObj.amountOfCompletions = quizObj.results ? quizObj.results.length : 0
+			quizObj.questionsAmount = quizObj.questions
+				? quizObj.questions.length
+				: 0;
+			quizObj.amountOfCompletions = quizObj.results
+				? quizObj.results.length
+				: 0;
 			return quizObj;
 		});
 		res.status(StatusCodes.OK).json(quizzesWithCount);
@@ -110,7 +121,9 @@ const getQuizzes = async (req, res) => {
 };
 const updateQuiz = async (req, res) => {
 	const { quizId } = req.params;
-	const { quiz: { name, description, questions: reqQuestions } } = req.body;
+	const {
+		quiz: { name, description, questions: reqQuestions },
+	} = req.body;
 	const transaction = await sequelize.transaction();
 
 	try {
@@ -128,11 +141,13 @@ const updateQuiz = async (req, res) => {
 
 		if (!foundQuiz) {
 			await transaction.rollback();
-			return res.status(StatusCodes.NOT_FOUND).json({ error: true, message: "Quiz not found" });
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ error: true, message: "Quiz not found" });
 		}
 
 		// Update the quiz fields
-		await foundQuiz.update({ name, description }, { transaction });
+		await foundQuiz.update({ name, description, questionsAmount: reqQuestions.length, }, { transaction });
 
 		// Process each question in the request
 		for (const questionData of reqQuestions) {
@@ -143,7 +158,7 @@ const updateQuiz = async (req, res) => {
 				if (question) {
 					await question.update(
 						{ text: questionData.text, type: questionData.type },
-						{ transaction }
+						{ transaction },
 					);
 				} else {
 					// In case the id doesn't match an existing record, create new
@@ -153,7 +168,7 @@ const updateQuiz = async (req, res) => {
 							type: questionData.type,
 							quizId: foundQuiz.id,
 						},
-						{ transaction }
+						{ transaction },
 					);
 				}
 			} else {
@@ -164,7 +179,7 @@ const updateQuiz = async (req, res) => {
 						type: questionData.type,
 						quizId: foundQuiz.id,
 					},
-					{ transaction }
+					{ transaction },
 				);
 			}
 
@@ -182,7 +197,7 @@ const updateQuiz = async (req, res) => {
 									isCorrect: answerData.isCorrect,
 									questionId: question.id,
 								},
-								{ transaction }
+								{ transaction },
 							);
 						} else {
 							// Create new answer if not found by id
@@ -192,7 +207,7 @@ const updateQuiz = async (req, res) => {
 									isCorrect: answerData.isCorrect,
 									questionId: question.id,
 								},
-								{ transaction }
+								{ transaction },
 							);
 						}
 					} else {
@@ -203,7 +218,7 @@ const updateQuiz = async (req, res) => {
 								isCorrect: answerData.isCorrect,
 								questionId: question.id,
 							},
-							{ transaction }
+							{ transaction },
 						);
 					}
 				}
@@ -226,7 +241,9 @@ const updateQuiz = async (req, res) => {
 		res.status(StatusCodes.OK).json(updatedQuiz);
 	} catch (error) {
 		await transaction.rollback();
-		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message });
+		res
+			.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.json({ error: true, message: error.message });
 	}
 };
 const removeQuiz = async (req, res) => {
@@ -236,8 +253,8 @@ const removeQuiz = async (req, res) => {
 			include: {
 				model: Question,
 				as: "questions",
-				include: [{ model: Answer, as: "answers" }]
-			}
+				include: [{ model: Answer, as: "answers" }],
+			},
 		});
 		if (!findQuiz) {
 			return res
@@ -247,8 +264,8 @@ const removeQuiz = async (req, res) => {
 
 		await Promise.all(
 			findQuiz.questions.flatMap((question) =>
-				question.answers.map((answer) => answer.destroy())
-			)
+				question.answers.map((answer) => answer.destroy()),
+			),
 		);
 
 		await Promise.all(findQuiz.questions.map((question) => question.destroy()));
