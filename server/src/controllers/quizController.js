@@ -1,11 +1,48 @@
-import { Quiz } from "../models/models.js";
+import {Answer, Question, Quiz} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
-const createQuiz = async (req, res) => {
-	try {
-		const existingQuestionnaire = await Quiz.create(req.body);
+/**
+ * quizData {object} name, description
+ * questions {array} of {object} with id, question, type
+ * answers {array} of {object} with id, answer, isRight
+ * @returns {Promise<void>}
+ */
 
-		res.status(StatusCodes.CREATED).send(existingQuestionnaire);
+const createQuiz = async (req, res) => {
+	const { quiz } = req.body;
+	try {
+		const createdQuiz = await Quiz.create({ name: quiz.name, description: quiz.description });
+		await Promise.all(
+			quiz.questions.map(async ({ text, type, answers }) => {
+				const createdQuestion = await Question.create({
+					text,
+					quizId: createdQuiz.id,
+					type,
+				});
+
+				if(Array.isArray(answers)) {
+					await Promise.all(
+						answers.map(async ({ answer, isCorrect }) => {
+							await Answer.create({
+								answer,
+								isCorrect,
+								questionId: createdQuestion.id
+							})
+						})
+					)
+				}
+		}));
+
+		const foundQuiz = await Quiz.findOne({
+			where: { id: createdQuiz.id},
+			include: [{
+				model: Question,
+				as: "questions",
+				include: [{ model: Answer, as: "answers" }]
+			}]
+		});
+
+		res.status(StatusCodes.CREATED).json(foundQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -31,17 +68,25 @@ const getQuiz = async (req, res) => {
 };
 const getQuizzes = async (req, res) => {
 	try {
-		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findAll({
-			where: { id: quizId },
+		const foundQuizzes = await Quiz.findAll({
+			include: [{
+				model: Question,
+				as: "questions",
+				attributes: ["id"]
+			}]
 		});
-		if (!findQuestionnaire) {
+		if (!foundQuizzes || !foundQuizzes.length) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
 				.json({ error: true, message: "Questionnaire Not Found" });
 		}
 
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+		const quizzesWithCount = foundQuizzes.map((quiz) => {
+			const quizObj = quiz.toJSON();
+			quizObj.questionsAmount = quizObj.questions ? quizObj.questions.length : 0;
+			return quizObj;
+		});
+		res.status(StatusCodes.OK).json(quizzesWithCount);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)

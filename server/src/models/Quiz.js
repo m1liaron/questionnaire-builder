@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../db/sequelize.js";
 
 const Quiz = sequelize.define(
-	"Questionnaire",
+	"Quiz",
 	{
 		id: {
 			type: DataTypes.UUID,
@@ -13,8 +13,9 @@ const Quiz = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
-				notEmpty: true,
-				message: "Name is required",
+				notNull: {
+					msg: "Name is required",
+				},
 			},
 			unique: true,
 		},
@@ -22,13 +23,15 @@ const Quiz = sequelize.define(
 			type: DataTypes.STRING,
 			allowNull: false,
 			validate: {
-				notEmpty: true,
-				message: "Description is required",
+				notEmpty: {
+					msg: "Description is required",
+				},
 			},
 		},
 		amountOfCompletions: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
+			defaultValue: 0
 		},
 	},
 	{
