@@ -77,8 +77,8 @@ const getQuizzes = async (req, res) => {
 		});
 		if (!foundQuizzes || !foundQuizzes.length) {
 			return res
-				.status(StatusCodes.NOT_FOUND)
-				.json({ error: true, message: "Questionnaire Not Found" });
+				.status(StatusCodes.OK)
+				.json([]);
 		}
 
 		const quizzesWithCount = foundQuizzes.map((quiz) => {
@@ -115,14 +115,14 @@ const updateQuiz = async (req, res) => {
 const removeQuiz = async (req, res) => {
 	try {
 		const { quizId } = req.params;
-		const findQuestionnaire = await Quiz.findByPk(quizId);
-		if (!findQuestionnaire) {
+		const findQuiz = await Quiz.findByPk(quizId);
+		if (!findQuiz) {
 			return res
 				.status(StatusCodes.NOT_FOUND)
-				.json({ error: true, message: "Questionnaire Not Found" });
+				.json({ error: true, message: "Quiz Not Found" });
 		}
-		await findQuestionnaire.destroy();
-		res.status(StatusCodes.OK).json(findQuestionnaire);
+		await findQuiz.destroy();
+		res.status(StatusCodes.OK).json(findQuiz);
 	} catch (error) {
 		res
 			.status(StatusCodes.INTERNAL_SERVER_ERROR)

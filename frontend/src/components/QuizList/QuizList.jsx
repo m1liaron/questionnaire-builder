@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {QuizItem} from "../QuizItem/QuizItem.jsx";
 import axios from "axios";
 import {apiUrl} from "../../api/apiUrl.js";
+import {toast, ToastContainer} from "react-toastify";
 
 const QuizList = () => {
     const [quizzes, setQuizzes] = useState();
@@ -14,13 +15,21 @@ const QuizList = () => {
         getQuizzes();
     }, []);
 
+    const handleRemoveQuiz = async (id) => {
+        const response = await axios.delete(`${apiUrl}/quizzes/${id}`);
+        if(response.status === 404) {
+            toast.error(response.statusText);
+        } else if(response.status < 404) {
+            setQuizzes(prevState => [...prevState].filter(quiz=> quiz.id !== id))
+            toast.success("Quiz successfully removed.");
+        }
+    }
+
     return (
         <div>
-
+            <ToastContainer/>
             <div className="d-flex justify-content-center flex-wrap align-items-center gap-5 p-3">
-                {quizzes?.length && (
-                    quizzes.map(quiz => <QuizItem key={quiz.id} {...quiz}/>)
-                )}
+                {quizzes?.map(quiz => <QuizItem key={quiz.id} {...quiz} onRemoveQuiz={handleRemoveQuiz}/>)}
             </div>
         </div>
     )

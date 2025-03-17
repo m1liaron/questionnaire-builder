@@ -8,7 +8,7 @@ const HomePage = () => {
         <div className="p-3">
             <h1>Quiz Catalog</h1>
 
-            <Link to={AppPath.CreateQUiz}>
+            <Link to={AppPath.CreateQuiz}>
                 <Button>Create Quiz</Button>
             </Link>
             <QuizList/>
