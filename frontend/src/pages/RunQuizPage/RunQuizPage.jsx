@@ -15,8 +15,20 @@ const RunQuizPage = () => {
     const [results, setResults] = useState([]);
     const [currentAnswer, setCurrentAnswer] = useState(null);
     const [currentAnswers, setCurrentAnswers] = useState([]);
-    const { questions } = quiz;
+    const [timeSpend, setTimeSpend] = useState(0);
 
+    useEffect(() => {
+        let intervalId;
+        if(isQuizStarted) {
+            intervalId = setInterval(() => {
+                setTimeSpend(prevTime => prevTime + 1);
+            }, 1000);
+
+            return () => {
+                clearInterval(intervalId);
+            }
+        }
+    }, [isQuizStarted])
 
     useEffect(() => {
         const getQuiz = async () => {
@@ -128,13 +140,15 @@ const RunQuizPage = () => {
             const finalResults = [...results, answerPayload]
             const validatedResultsData = {
                 quizId: quiz.id,
+                timeSpend: timeSpend,
                 questions: finalResults.map(result => ({
                     questionId: result.question.id,
                     answerId: result.answer ? result.answer.id : null,
                     userAnswer: result.userAnswer,
-                    isAnswerCorrect: result.userAnswer === result.answer?.answer
+                    isAnswerCorrect: result.userAnswer === result.answer?.answer,
                 }))
             }
+            console.log(timeSpend)
             await submitResults(validatedResultsData);
             setIsQuizStarted(false);
             setIsQuizFinished(true);
@@ -156,6 +170,7 @@ const RunQuizPage = () => {
             <header className="d-flex align-items-center gap-5">
                 <FaArrowLeft cursor="pointer" size={30} onClick={navigateBack} />
                 <h3>{quiz.name || "Loading Quiz..."}</h3>
+                {isQuizStarted && <span>{timeSpend}</span>}
             </header>
 
             {isQuizFinished ? (

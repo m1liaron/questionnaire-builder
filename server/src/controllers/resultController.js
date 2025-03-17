@@ -3,7 +3,8 @@ import { StatusCodes } from "http-status-codes";
 
 const createResult = async (req, res) => {
 	try {
-		const result = await Result.create({ quizId: req.body.quizId});
+		const { quizId, timeSpend } = req.body;
+		const result = await Result.create({ quizId, timeSpend });
 
 		const resultQuestions = await Promise.all(
 			[...req.body.questions].map(async ({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
@@ -12,7 +13,7 @@ const createResult = async (req, res) => {
 					questionId,
 					answerId,
 					userAnswer,
-					isAnswerCorrect
+					isAnswerCorrect,
 				});
 			}),
 		);

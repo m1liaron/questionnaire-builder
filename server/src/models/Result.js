@@ -17,6 +17,10 @@ const Result = sequelize.define(
 				model: Quiz,
 				key: "id",
 			}
+		},
+		timeSpend: {
+			type: DataTypes.INTEGER,
+			allowNull: false
 		}
 	},
 	{
