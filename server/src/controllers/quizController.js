@@ -1,5 +1,6 @@
 import {Answer, Question, Quiz, Result} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
+import {sequelize} from "../db/sequelize.js";
 
 /**
  * quizData {object} name, description
@@ -108,22 +109,124 @@ const getQuizzes = async (req, res) => {
 	}
 };
 const updateQuiz = async (req, res) => {
+	const { quizId } = req.params;
+	const { quiz: { name, description, questions: reqQuestions } } = req.body;
+	const transaction = await sequelize.transaction();
+
 	try {
-		const { quizId } = req.params;
-		const updatedQuestionnaire = await Quiz.update(req.body, {
-			where: { id: quizId },
-			returning: true,
+		// Find the quiz with its associations
+		const foundQuiz = await Quiz.findByPk(quizId, {
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					include: [{ model: Answer, as: "answers" }],
+				},
+			],
+			transaction,
 		});
-		if (updatedQuestionnaire[0] === 0) {
-			return res
-				.status(StatusCodes.NOT_FOUND)
-				.json({ error: true, message: "Questionnaire Not Found" });
+
+		if (!foundQuiz) {
+			await transaction.rollback();
+			return res.status(StatusCodes.NOT_FOUND).json({ error: true, message: "Quiz not found" });
 		}
-		res.status(StatusCodes.OK).json(updatedQuestionnaire);
+
+		// Update the quiz fields
+		await foundQuiz.update({ name, description }, { transaction });
+
+		// Process each question in the request
+		for (const questionData of reqQuestions) {
+			let question;
+			if (questionData.id) {
+				// Update existing question
+				question = await Question.findByPk(questionData.id, { transaction });
+				if (question) {
+					await question.update(
+						{ text: questionData.text, type: questionData.type },
+						{ transaction }
+					);
+				} else {
+					// In case the id doesn't match an existing record, create new
+					question = await Question.create(
+						{
+							text: questionData.text,
+							type: questionData.type,
+							quizId: foundQuiz.id,
+						},
+						{ transaction }
+					);
+				}
+			} else {
+				// Create new question if no id provided
+				question = await Question.create(
+					{
+						text: questionData.text,
+						type: questionData.type,
+						quizId: foundQuiz.id,
+					},
+					{ transaction }
+				);
+			}
+
+			// Process answers for the current question, if provided
+			if (Array.isArray(questionData.answers)) {
+				for (const answerData of questionData.answers) {
+					let answer;
+					if (answerData.id) {
+						// Update existing answer
+						answer = await Answer.findByPk(answerData.id, { transaction });
+						if (answer) {
+							await answer.update(
+								{
+									answer: answerData.answer,
+									isCorrect: answerData.isCorrect,
+									questionId: question.id,
+								},
+								{ transaction }
+							);
+						} else {
+							// Create new answer if not found by id
+							answer = await Answer.create(
+								{
+									answer: answerData.answer,
+									isCorrect: answerData.isCorrect,
+									questionId: question.id,
+								},
+								{ transaction }
+							);
+						}
+					} else {
+						// Create new answer if no id provided
+						await Answer.create(
+							{
+								answer: answerData.answer,
+								isCorrect: answerData.isCorrect,
+								questionId: question.id,
+							},
+							{ transaction }
+						);
+					}
+				}
+			}
+		}
+
+		await transaction.commit();
+
+		// Refetch the updated quiz with associations to return in the response
+		const updatedQuiz = await Quiz.findByPk(quizId, {
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					include: [{ model: Answer, as: "answers" }],
+				},
+			],
+		});
+
+		res.status(StatusCodes.OK).json(updatedQuiz);
 	} catch (error) {
-		res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ error: true, message: error.message });
+		await transaction.rollback();
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: true, message: error.message });
 	}
 };
 const removeQuiz = async (req, res) => {
