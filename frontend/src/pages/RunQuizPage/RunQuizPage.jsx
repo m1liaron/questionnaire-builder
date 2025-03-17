@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { Button, Form, InputGroup, ListGroup } from "react-bootstrap";
+import { Button, Form, ListGroup } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { apiUrl } from "../../common/enums/apiUrl.js";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
@@ -127,7 +127,11 @@ const RunQuizPage = () => {
 			answerPayload.userAnswer = currentAnswers.map((a) => a.answer).join(", ");
 		}
 
-		setResults((prevResults) => [...prevResults, answerPayload]);
+		setResults((prevResults) => {
+            const updatedResults = [...prevResults, answerPayload]
+            localStorage.setItem("results", JSON.stringify(updatedResults));
+            return  updatedResults;
+        });
 
 		setCurrentAnswer("");
 		setCurrentAnswers([]);
@@ -162,6 +166,25 @@ const RunQuizPage = () => {
 			console.error("Failed to submit results:", error);
 		}
 	};
+
+    useEffect(() => {
+        const handleBeforeUnload = (event) => {
+            event.preventDefault();
+
+            event.returnValue =
+                "Your progress will not be saved if you leave this page.";
+            return "Your progress will not be saved if you leave this page.";
+        };
+
+        if(isQuizStarted) {
+            window.addEventListener("beforeunload", handleBeforeUnload);
+        }
+
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
 
 	return (
 		<div className="p-5">
