@@ -1,27 +1,14 @@
 import {useState} from "react";
 import { QuestionItem } from "../QuestionItem/QuestionItem";
-import ToastContext from "react-bootstrap/ToastContext";
 import {toast, ToastContainer} from "react-toastify";
-import axios from "axios";
-import {apiUrl} from "../../api/apiUrl.js";
 
-const QuestionList = () => {
-    const [quiz, setQuiz] = useState({
-        name: "",
-        description: "",
-        questions: [
-            {
-                id: 1,
-                text: "Question 1",
-                type: "Text",
-                answers: []
-            }
-        ]
-    });
+
+const QuizForm = ({ initialQuiz, onSubmit, submitButtonText }) => {
+    const [quiz, setQuiz] = useState(initialQuiz);
 
     const generateNewId = (items) => {
         return items.length > 0 ? Math.max(...items.map((item) => item.id)) + 1 : 1;
-      };
+    };
 
       const handleAddQuestion = () => {
         const newQuestionId = generateNewId(quiz.questions);
@@ -197,10 +184,10 @@ const QuestionList = () => {
     };
 
 
-  const createQuiz = async () => {
-        validateQuizData();
-        const response = await  axios.post(`${apiUrl}/quizzes`, {quiz});
-        console.log(response);
+  const handleSubmit = async () => {
+        if(validateQuizData) {
+            onSubmit({quiz});
+        }
   }
 
     return (
@@ -215,7 +202,7 @@ const QuestionList = () => {
                     <label htmlFor="exampleInputEmail1" className="form-label">Description</label>
                     <input type="text" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" onChange={(e) => onChangeDescription(e.target.value)} value={quiz.description}/>
                 </div>
-                <button type="submit" className="btn btn-success" onClick={createQuiz}>Create Quiz</button>
+                <button type="submit" className="btn btn-success" onClick={handleSubmit}>{submitButtonText}</button>
             </div>
             <button type="button" className="btn btn-primary" onClick={handleAddQuestion}>Add Question</button>
             <div>
@@ -239,4 +226,4 @@ const QuestionList = () => {
     )
 }
 
-export {QuestionList};
+export { QuizForm }

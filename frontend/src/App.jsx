@@ -4,7 +4,7 @@ import {
     Routes
 } from "react-router-dom";
 import { AppPath } from "./common/enums/AppPath.js";
-import {CreateQuizPage, HomePage, QuizPage, RunQuizPage} from "./pages/pages.js";
+import {CreateQuizPage, HomePage, QuizPage, RunQuizPage, UpdateQuizPage} from "./pages/pages.js";
 
 function App() {
   return (
@@ -14,6 +14,7 @@ function App() {
             <Route path={AppPath.QuizPage} element={<QuizPage/>}/>
             <Route path={AppPath.CreateQuiz} element={<CreateQuizPage/>}/>
             <Route path={AppPath.RunQuizPage} element={<RunQuizPage/>}/>
+            <Route path={AppPath.UpdateQuizPage} element={<UpdateQuizPage/>}/>
         </Routes>
     </BrowserRouter>
   )

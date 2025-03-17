@@ -13,7 +13,7 @@ const QuestionItem = ({
   onToggleCorrectAnswer,
   onAddAnswer
 }) => {
-  const { id, question: questionText, type } = question;
+  const { id, text, type } = question;
 
   return (
     <div className="border border-2 m-2 p-2">
@@ -28,7 +28,7 @@ const QuestionItem = ({
               type="text"
               className="form-control"
               id={`question-${id}`}
-              value={questionText}
+              value={text}
               onChange={(e) => onQuestionChange(id, e.target.value)}
             />
           </div>
