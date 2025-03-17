@@ -8,6 +8,7 @@ import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
 const RunQuizPage = () => {
 	const { quizId } = useParams();
 	const [quiz, setQuiz] = useState({});
+    const [isLoading, setIsLoading] = useState(true);
 	const [isQuizStarted, setIsQuizStarted] = useState(false);
 	const [isQuizFinished, setIsQuizFinished] = useState(false);
 	const [questionIndex, setQuestionIndex] = useState(0);
@@ -15,6 +16,46 @@ const RunQuizPage = () => {
 	const [currentAnswer, setCurrentAnswer] = useState("");
 	const [currentAnswers, setCurrentAnswers] = useState([]);
 	const timeSpentRef = useRef(0);
+    const storageKey = `quizState-${quizId}`;
+
+    useEffect(() => {
+        const savedState = localStorage.getItem(storageKey);
+        if (savedState && !isLoading) {
+            const parsed = JSON.parse(savedState);
+            setIsQuizStarted(parsed.isQuizStarted);
+            setIsQuizFinished(parsed.isQuizFinished);
+            setQuestionIndex(parsed.questionIndex);
+            setResults(parsed.results);
+            setCurrentAnswer(parsed.currentAnswer);
+            setCurrentAnswers(parsed.currentAnswers);
+            timeSpentRef.current = parsed.timeSpent || 0;
+        }
+    }, [storageKey, isLoading]);
+
+    useEffect(() => {
+        if (isQuizStarted) {
+            const state = {
+                isQuizStarted,
+                isQuizFinished,
+                questionIndex,
+                results,
+                currentAnswer,
+                currentAnswers,
+                timeSpent: timeSpentRef.current,
+            };
+            localStorage.setItem(storageKey, JSON.stringify(state));
+        }
+    }, [isQuizStarted, isQuizFinished, questionIndex, results, currentAnswer, currentAnswers, storageKey]);
+
+
+    useEffect(() => {
+        const getQuiz = async () => {
+            const response = await axios.get(`${apiUrl}/quizzes/${quizId}`);
+            setIsLoading(false);
+            setQuiz(response.data);
+        };
+        getQuiz();
+    }, [quizId]);
 
 	useEffect(() => {
 		let intervalId;
@@ -26,13 +67,6 @@ const RunQuizPage = () => {
 		return () => clearInterval(intervalId);
 	}, [isQuizStarted]);
 
-	useEffect(() => {
-		const getQuiz = async () => {
-			const response = await axios.get(`${apiUrl}/quizzes/${quizId}`);
-			setQuiz(response.data);
-		};
-		getQuiz();
-	}, [quizId]);
 
 	useEffect(() => {
 		setCurrentAnswer("");
@@ -43,6 +77,19 @@ const RunQuizPage = () => {
 		setIsQuizStarted(true);
 		setResults([]);
 		setQuestionIndex(0);
+
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                isQuizStarted: true,
+                isQuizFinished: false,
+                questionIndex: 0,
+                results: [],
+                currentAnswer: "",
+                currentAnswers: [],
+                timeSpent: 0,
+            })
+        );
 	};
 
 	const RenderQuestionAnswer = () => {
@@ -127,13 +174,21 @@ const RunQuizPage = () => {
 			answerPayload.userAnswer = currentAnswers.map((a) => a.answer).join(", ");
 		}
 
-		setResults((prevResults) => {
-            const updatedResults = [...prevResults, answerPayload]
-            localStorage.setItem("results", JSON.stringify(updatedResults));
-            return  updatedResults;
+        setResults((prevResults) => {
+            const updatedResults = [...prevResults, answerPayload];
+            localStorage.setItem(storageKey, JSON.stringify({
+                isQuizStarted,
+                isQuizFinished,
+                questionIndex,
+                results: updatedResults,
+                currentAnswer: "",
+                currentAnswers: [],
+                timeSpent: timeSpentRef.current,
+            }));
+            return updatedResults;
         });
 
-		setCurrentAnswer("");
+        setCurrentAnswer("");
 		setCurrentAnswers([]);
 
 		if (questionIndex < quiz.questions.length - 1) {
@@ -154,6 +209,7 @@ const RunQuizPage = () => {
 			await submitResults(validatedResultsData);
 			setIsQuizStarted(false);
 			setIsQuizFinished(true);
+            localStorage.removeItem(storageKey);
 		}
 	};
 
