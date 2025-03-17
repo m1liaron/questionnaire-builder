@@ -1,4 +1,4 @@
-import {Answer, Question, Quiz} from "../models/models.js";
+import {Answer, Question, Quiz, Result} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
 /**
@@ -75,11 +75,18 @@ const getQuiz = async (req, res) => {
 const getQuizzes = async (req, res) => {
 	try {
 		const foundQuizzes = await Quiz.findAll({
-			include: [{
-				model: Question,
-				as: "questions",
-				attributes: ["id"]
-			}]
+			include: [
+				{
+					model: Question,
+					as: "questions",
+					attributes: ["id"],
+				},
+				{
+					model: Result,
+					as: "results",
+					attributes: ["id"]
+				}
+			],
 		});
 		if (!foundQuizzes || !foundQuizzes.length) {
 			return res
@@ -90,6 +97,7 @@ const getQuizzes = async (req, res) => {
 		const quizzesWithCount = foundQuizzes.map((quiz) => {
 			const quizObj = quiz.toJSON();
 			quizObj.questionsAmount = quizObj.questions ? quizObj.questions.length : 0;
+			quizObj.amountOfCompletions = quizObj.results ? quizObj.results.length : 0
 			return quizObj;
 		});
 		res.status(StatusCodes.OK).json(quizzesWithCount);

@@ -31,12 +31,7 @@ const Quiz = sequelize.define(
 					msg: "Description is required",
 				},
 			},
-		},
-		amountOfCompletions: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-			defaultValue: 0
-		},
+		}
 	},
 	{
 		timestamps: true,

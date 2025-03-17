@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+    import {useEffect, useState} from "react";
 import {QuizItem} from "../QuizItem/QuizItem.jsx";
 import axios from "axios";
 import {apiUrl} from "../../api/apiUrl.js";

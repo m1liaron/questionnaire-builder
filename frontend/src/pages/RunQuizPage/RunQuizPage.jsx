@@ -4,10 +4,10 @@ import axios from "axios";
 import {apiUrl} from "../../api/apiUrl.js";
 import {useNavigate, useParams} from "react-router-dom";
 import {FaArrowLeft, FaArrowRight} from "react-icons/fa";
+import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
 
 const RunQuizPage = () => {
     const { quizId } = useParams();
-    const navigate = useNavigate();
     const [quiz, setQuiz] = useState({});
     const [isQuizStarted, setIsQuizStarted] = useState(false);
     const [isQuizFinished, setIsQuizFinished] = useState(false);
@@ -38,9 +38,6 @@ const RunQuizPage = () => {
         getQuiz();
     }, [quizId]);
 
-    const navigateBack = () => {
-        navigate(-1);
-    }
 
     const handleStartQuiz = () => {
         setIsQuizStarted(true);
@@ -168,7 +165,7 @@ const RunQuizPage = () => {
     return (
         <div className="p-5">
             <header className="d-flex align-items-center gap-5">
-                <FaArrowLeft cursor="pointer" size={30} onClick={navigateBack} />
+                <BackButton/>
                 <h3>{quiz.name || "Loading Quiz..."}</h3>
                 {isQuizStarted && <span>{timeSpend}</span>}
             </header>

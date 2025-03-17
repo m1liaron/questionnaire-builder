@@ -4,7 +4,7 @@ import {Button, Modal} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import {AppPath} from "../../common/enums/AppPath.js";
 
-const QuizItem = ({ id, name, description, questionsAmount = 1, onRemoveQuiz }) => {
+const QuizItem = ({ id, name, description, questionsAmount = 1, amountOfCompletions = 0, onRemoveQuiz }) => {
     const [showActionsModal, setShowActionsModal] = useState(false);
     const [showAlertModal, setShowAlertModal] = useState(false);
 
@@ -27,7 +27,10 @@ const QuizItem = ({ id, name, description, questionsAmount = 1, onRemoveQuiz }) 
                 </div>
                 <p style={{ lineBreak: "anywhere"}}>{description}</p>
 
-                <p>Questions: {questionsAmount}</p>
+                <div className="d-flex justify-content-between">
+                    <p>Questions: {questionsAmount}</p>
+                    <p className="badge text-bg-primary text-wrap">Amount Of Completions: {amountOfCompletions}</p>
+                </div>
             </div>
             {showActionsModal && (
                     <div
