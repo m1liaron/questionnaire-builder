@@ -107,11 +107,11 @@ const HomePage = () => {
 					</div>
 					<div className="d-flex p-2 justify-content-between">
 						{order === "ASC" ? (
-							<FaSortAmountUpAlt size={30} onClick={toggleOrder} />
+							<FaSortAmountUpAlt size={30} cursor="pointer" onClick={toggleOrder} />
 						) : (
-							<FaSortAmountDownAlt size={30} onClick={toggleOrder} />
+							<FaSortAmountDownAlt size={30} cursor="pointer" onClick={toggleOrder} />
 						)}
-						<RiResetLeftFill size={30} onClick={() => setSortBy("name")} />
+						<RiResetLeftFill size={30} cursor="pointer" onClick={() => setSortBy("name")} />
 					</div>
 				</div>
 			)}
