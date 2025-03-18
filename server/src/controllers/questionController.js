@@ -1,5 +1,5 @@
-import { Question } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
+import { Question } from "../models/models.js";
 
 const getQuestions = async (req, res) => {
 	try {

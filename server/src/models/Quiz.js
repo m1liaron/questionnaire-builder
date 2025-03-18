@@ -35,13 +35,13 @@ const Quiz = sequelize.define(
 		questionsAmount: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			defaultValue: 0
+			defaultValue: 0,
 		},
 		amountOfCompletions: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
-			defaultValue: 0
-		}
+			defaultValue: 0,
+		},
 	},
 	{
 		timestamps: true,

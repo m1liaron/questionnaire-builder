@@ -3,9 +3,9 @@ const app = express();
 import cors from "cors";
 import { connectDB, sequelize } from "./db/sequelize.js";
 import {
-	quizRoute,
-	questionRoute,
 	answerRoute,
+	questionRoute,
+	quizRoute,
 	resultRoute,
 } from "./routers/routers.js";
 

@@ -9,12 +9,10 @@ const createQuizValidateMiddleware = (req, res, next) => {
 
 	// Validate quiz name and description
 	if (!quiz.name || typeof quiz.name !== "string" || !quiz.name.trim()) {
-		return res
-			.status(400)
-			.json({
-				error: true,
-				message: "Quiz name is required and must be a non-empty string.",
-			});
+		return res.status(400).json({
+			error: true,
+			message: "Quiz name is required and must be a non-empty string.",
+		});
 	}
 
 	if (
@@ -22,12 +20,10 @@ const createQuizValidateMiddleware = (req, res, next) => {
 		typeof quiz.description !== "string" ||
 		!quiz.description.trim()
 	) {
-		return res
-			.status(400)
-			.json({
-				error: true,
-				message: "Quiz description is required and must be a non-empty string.",
-			});
+		return res.status(400).json({
+			error: true,
+			message: "Quiz description is required and must be a non-empty string.",
+		});
 	}
 
 	// Validate questions array
