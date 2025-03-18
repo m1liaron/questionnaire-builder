@@ -1,2 +1,2 @@
-const apiUrl = "http://localhost:4000";
+const apiUrl = "questionnaire-builder-production.up.railway.app";
 export { apiUrl };
