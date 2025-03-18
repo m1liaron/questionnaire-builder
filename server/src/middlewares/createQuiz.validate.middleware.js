@@ -37,7 +37,7 @@ const createQuizValidateMiddleware = (req, res, next) => {
 			.json({ error: true, message: "At least one question is required." });
 	}
 
-	const allowedTypes = ["Text", "Single Choice", "Multiple Choices"];
+	const allowedTypes = ["Text", "Single Choice", "Multiple Choices", "Image"];
 
 	for (let i = 0; i < quiz.questions.length; i++) {
 		const question = quiz.questions[i];
@@ -61,7 +61,7 @@ const createQuizValidateMiddleware = (req, res, next) => {
 		}
 
 		// If the question type is not "Text", ensure there are answers.
-		if (question.type !== "Text") {
+		if (question.type !== "Text" && question.type !== "Image") {
 			if (!Array.isArray(question.answers) || question.answers.length < 2) {
 				return res.status(400).json({
 					error: true,

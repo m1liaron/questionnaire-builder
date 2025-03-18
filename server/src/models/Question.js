@@ -29,7 +29,7 @@ const Question = sequelize.define(
 			onDelete: "CASCADE",
 		},
 		type: {
-			type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices"),
+			type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices", "Image"),
 			allowNull: false,
 			defaultValue: "Text",
 			validate: {

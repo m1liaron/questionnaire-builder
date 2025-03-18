@@ -18,7 +18,7 @@ app.use("/questions", questionRoute);
 app.use("/answers", answerRoute);
 app.use("/results", resultRoute);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 (async () => {
 	try {

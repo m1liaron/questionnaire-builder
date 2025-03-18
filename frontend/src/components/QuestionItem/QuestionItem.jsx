@@ -3,6 +3,13 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 
+const questionsType = [
+	{ key: "Text", label: "Text" },
+	{ key: "Single Choice", label: "Single Choice" },
+	{ key: "Multiple Choices", label: "Multiple Choices" },
+	{ key: "Image", label: "Image" },
+]
+
 const QuestionItem = ({
 	question,
 	index,
@@ -62,15 +69,16 @@ const QuestionItem = ({
 						<label htmlFor={`type-${id}`} className="form-label">
 							Type
 						</label>
+
 						<select
 							name="type"
 							id={`type-${id}`}
 							value={type}
 							onChange={(e) => onTypeChange(id, e.target.value)}
 						>
-							<option value="Text">Text</option>
-							<option value="Single Choice">Single Choice</option>
-							<option value="Multiple Choices">Multiple Choices</option>
+							{questionsType.map((questionType) => (
+								<option key={questionType.key} value={questionType.key}>{questionType.label}</option>
+							))}
 						</select>
 					</div>
 				</div>
@@ -82,7 +90,7 @@ const QuestionItem = ({
 				/>
 			</div>
 
-			{type !== "Text" && (
+			{type !== "Text" && type !== "Image" && (
 				<div>
 					<span>Answers</span>
 					<ul className="list-group">
@@ -92,7 +100,7 @@ const QuestionItem = ({
 									Add Answer
 								</Button>
 							)}
-						{type !== "Text" &&
+						{type !== "Text" || type !== "Image" &&
 							answers.map((answer, idx) => (
 								<li
 									key={answer.id}

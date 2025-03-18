@@ -40,7 +40,7 @@ const getResults = async (req, res) => {
 	try {
 		const results = await Result.findAll({
 			where: { id: resultId },
-			include: [{ model: ResultQuestion, as: "resultQuestions " }],
+			include: [{ model: ResultQuestion, as: "resultQuestions" }],
 		});
 		res.status(StatusCodes.CREATED).json(results);
 	} catch (error) {
