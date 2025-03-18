@@ -110,7 +110,7 @@ const RunQuizPage = () => {
 						))}
 					</ListGroup>
 				);
-			case "Multiple Choice":
+			case "Multiple Choices":
 				return (
 					<ListGroup>
 						{currentQuestion.answers.map((answer) => (
@@ -147,9 +147,6 @@ const RunQuizPage = () => {
 
 	// Called when user clicks "Answer" button
 	const handleAnswerQuestion = async () => {
-		if (currentAnswer.length <= 0 || !currentAnswers.length <= 0) {
-			return alert("Answer on question!");
-		}
 		const currentQuestion = quiz.questions[questionIndex];
 		const rightAnswer = currentQuestion.answers.find(
 			(answer) => answer.isCorrect,

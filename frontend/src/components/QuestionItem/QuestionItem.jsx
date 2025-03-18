@@ -90,7 +90,7 @@ const QuestionItem = ({
 				/>
 			</div>
 
-			{type !== "Text" && type !== "Image" && (
+			{(type !== "Text" || type !== "Image") && (
 				<div>
 					<span>Answers</span>
 					<ul className="list-group">
@@ -100,7 +100,7 @@ const QuestionItem = ({
 									Add Answer
 								</Button>
 							)}
-						{type !== "Text" || type !== "Image" &&
+						{(type !== "Text" || type !== "Image") &&
 							answers.map((answer, idx) => (
 								<li
 									key={answer.id}
