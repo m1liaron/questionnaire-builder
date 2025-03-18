@@ -4,7 +4,6 @@ import { Button, Form, ListGroup } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { apiUrl } from "../../common/enums/apiUrl.js";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
-import {convertImageToBase64} from "../../utils/convertImageToBase64.js";
 
 const RunQuizPage = () => {
 	const { quizId } = useParams();
@@ -111,7 +110,7 @@ const RunQuizPage = () => {
 						))}
 					</ListGroup>
 				);
-			case "Multiple Choice":
+			case "Multiple Choices":
 				return (
 					<ListGroup>
 						{currentQuestion.answers.map((answer) => (
@@ -148,9 +147,6 @@ const RunQuizPage = () => {
 
 	// Called when user clicks "Answer" button
 	const handleAnswerQuestion = async () => {
-		if (currentAnswer.length <= 0 || !currentAnswers.length <= 0) {
-			return alert("Answer on question!");
-		}
 		const currentQuestion = quiz.questions[questionIndex];
 		const rightAnswer = currentQuestion.answers.find(
 			(answer) => answer.isCorrect,
@@ -161,7 +157,7 @@ const RunQuizPage = () => {
 			answer: rightAnswer,
 			userAnswer: "",
 		};
-		if (currentQuestion.type === "Text") {
+		if (currentQuestion.type === "Text" || currentQuestion.type === "Image") {
 			answerPayload.userAnswer = currentAnswer;
 		} else if (currentQuestion.type === "Single Choice") {
 			answerPayload.userAnswer = currentAnswer ? currentAnswer.answer : "";
@@ -237,20 +233,6 @@ const RunQuizPage = () => {
         };
     }, []);
 
-	const handleSaveImage = async (e) => {
-		const file = e.target.files[0];
-		if (file) {
-			try {
-				const dataUrl  = await convertImageToBase64(file);
-				console.log(dataUrl)
-				setCurrentAnswer(dataUrl);
-			} catch (error) {
-				console.error("Failed to convert image", error);
-			}
-		}
-	};
-
-
 	return (
 		<div className="p-5">
 			<header className="d-flex align-items-center gap-5">
@@ -296,15 +278,6 @@ const RunQuizPage = () => {
                     )}
 					{quiz?.questions[questionIndex]?.type === "Image" && (
 						<>
-							{currentAnswer && (
-								<img src={currentAnswer} alt="Answer Preview" style={{ maxWidth: 400 }} />
-							)}
-							<input
-								type="file"
-								accept="image/*"
-								onChange={handleSaveImage}
-							/>
-
 							<Form.Control
 								placeholder="Your Image Url"
 								aria-label="Your Image Url"

@@ -65,6 +65,9 @@ const QuizItem = ({
 							<Link to={AppPath.UpdateQuizPage.replace(":quizId", id)}>
 								<Button variant="primary">Edit</Button>
 							</Link>
+							<Link to={AppPath.StatisticsPage.replace(":quizId", id)}>
+								<Button variant="primary">Statistics</Button>
+							</Link>
 							<Link to={AppPath.RunQuizPage.replace(":quizId", id)}>
 								<Button variant="secondary">Run</Button>
 							</Link>

@@ -27,7 +27,6 @@ const HomePage = () => {
 	// When sort options change, reset to first page and clear quizzes
 	useEffect(() => {
 		setPage(1);
-		setQuizzes([]);
 	}, [sortBy, order]);
 
 	// Check if the user has scrolled to the bottom
@@ -77,7 +76,7 @@ const HomePage = () => {
 		if(haveMoreQuizzes) {
 			getQuizzes();
 		}
-	}, [page, sortBy, order]);
+	}, [page, sortBy, order, haveMoreQuizzes]);
 
 	const toggleOrder = () => setOrder(order === "ASC" ? "DESC" : "ASC");
 

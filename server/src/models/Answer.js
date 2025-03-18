@@ -19,6 +19,11 @@ const Answer = sequelize.define(
 			allowNull: false,
 			defaultValue: false,
 		},
+		amountOfSelection: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+			defaultValue: 0
+		},
 		questionId: {
 			type: DataTypes.UUID,
 			allowNull: false,

@@ -1,4 +1,4 @@
-import { Answer, Question, Quiz, Result } from "../models/models.js";
+import { Answer, Question, Quiz, Result, ResultQuestion } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../db/sequelize.js";
 
@@ -119,6 +119,43 @@ const getQuizzes = async (req, res) => {
 		res.status(500).json({ error: true, message: error.message });
 	}
 };
+
+const getStatisticsQuiz = async (req, res) => {
+	try {
+		const { quizId } = req.params;
+		const findQuiz = await Quiz.findByPk(quizId, {
+			include: [
+				{
+					model: Result,
+					as: "results",
+					include: [{ 
+						model: ResultQuestion, 
+						as: "resultQuestions",
+						include: [
+							{ 
+								model: Question, 
+								as: "question",
+								include: [{ model: Answer, as: "answers" }]
+							},
+						]
+					}],
+				},
+			],
+		});
+		if (!findQuiz) {
+			return res
+				.status(StatusCodes.NOT_FOUND)
+				.json({ error: true, message: "Questionnaire Not Found" });
+		}
+
+		res.status(StatusCodes.OK).json(findQuiz);
+	} catch (error) {
+		res
+			.status(StatusCodes.INTERNAL_SERVER_ERROR)
+			.json({ error: true, message: error.message });
+	}
+};
+
 
 const updateQuiz = async (req, res) => {
 	const { quizId } = req.params;
@@ -279,4 +316,4 @@ const removeQuiz = async (req, res) => {
 	}
 };
 
-export { createQuiz, getQuiz, getQuizzes, updateQuiz, removeQuiz };
+export { createQuiz, getQuiz, getQuizzes, updateQuiz, removeQuiz, getStatisticsQuiz };

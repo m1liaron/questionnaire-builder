@@ -1,4 +1,4 @@
-import {Quiz, Result, ResultQuestion} from "../models/models.js";
+import {Answer, Quiz, Result, ResultQuestion} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 
 const createResult = async (req, res) => {
@@ -16,13 +16,19 @@ const createResult = async (req, res) => {
 		const resultQuestions = await Promise.all(
 			[...req.body.questions].map(
 				async ({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
-					return await ResultQuestion.create({
+					const resultQuestion = await ResultQuestion.create({
 						resultId: result.id,
 						questionId,
 						answerId,
 						userAnswer,
 						isAnswerCorrect,
 					});
+					const answer = await Answer.findByPk(answerId);
+					await answer.update({
+						amountOfSelection: answer.amountOfSelection += 1
+					})
+					await answer.save();
+					return resultQuestion;
 				},
 			),
 		);
