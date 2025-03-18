@@ -128,7 +128,17 @@ const getStatisticsQuiz = async (req, res) => {
 				{
 					model: Result,
 					as: "results",
-					include: [{ model: ResultQuestion, as: "resultQuestions" }],
+					include: [{ 
+						model: ResultQuestion, 
+						as: "resultQuestions",
+						include: [
+							{ 
+								model: Question, 
+								as: "question",
+								include: [{ model: Answer, as: "answers" }]
+							},
+						]
+					}],
 				},
 			],
 		});

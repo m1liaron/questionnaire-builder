@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {apiUrl} from "../../common/enums/apiUrl.js";
-import {useParams} from "react-router-dom";
+import { apiUrl } from "../../common/enums/apiUrl.js";
+import { useParams } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import {
     Chart as ChartJS,
@@ -12,9 +12,11 @@ import {
     Title,
     Tooltip,
     Legend,
-    BarElement
+    BarElement,
+    ArcElement
 } from "chart.js";
-import {BackButton} from "../../components/common/BackButton/BackButton.jsx";
+import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
+import { Bar, Pie } from "react-chartjs-2";
 
 ChartJS.register(
     CategoryScale,
@@ -24,9 +26,9 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
-)
-import { Bar, Pie } from "react-chartjs-2";
+    Legend,
+    ArcElement
+);
 
 const StatisticsPage = () => {
     const { quizId } = useParams();
@@ -34,30 +36,34 @@ const StatisticsPage = () => {
 
     useEffect(() => {
         const getStatistics = async () => {
-            const response = await axios.get(`${apiUrl}/quizzes/${quizId}/statistics`);
-            setQuiz(response.data)
-        }
+            try {
+                const response = await axios.get(`${apiUrl}/quizzes/${quizId}/statistics`);
+                setQuiz(response.data);
+            } catch (error) {
+                console.error("Error fetching statistics:", error);
+            }
+        };
         getStatistics();
     }, [quizId]);
 
     if (!quiz || !quiz.results) return <h1>Loading statistics...</h1>;
 
+    // Calculate average completion time
+    const allTimeSpend = quiz.results.map(result => result.timeSpend);
+    const sumTimeSpend = allTimeSpend.reduce((a, b) => a + b, 0);
+    const averageCompletionTime = allTimeSpend.length ? sumTimeSpend / allTimeSpend.length : 0;
 
-    const allTimeSpend = quiz.results?.map(result => result.timeSpend);
-    const sumTimeSpend = allTimeSpend?.reduce((a,b) => a + b);
-    const averageCompletionTime = sumTimeSpend / allTimeSpend?.length;
-
+    // Group completions by day, week, and month for bar charts
     const completionsByPeriod = quiz.results.reduce((acc, result) => {
         if (!result.createdAt) return acc;
         
-        const date = format(parseISO(result.createdAt), "yyyy-MM-dd"); // Format as YYYY-MM-DD
-        const week = format(parseISO(result.createdAt), "yyyy-'W'ww"); // Format as YYYY-WEEK
-        const month = format(parseISO(result.createdAt), "yyyy-MM"); // Format as YYYY-MM
+        const date = format(parseISO(result.createdAt), "yyyy-MM-dd"); // e.g., 2025-03-18
+        const week = format(parseISO(result.createdAt), "yyyy-'W'ww");  // e.g., 2025-W11
+        const month = format(parseISO(result.createdAt), "yyyy-MM");     // e.g., 2025-03
 
         acc.daily[date] = (acc.daily[date] || 0) + 1;
         acc.weekly[week] = (acc.weekly[week] || 0) + 1;
         acc.monthly[month] = (acc.monthly[month] || 0) + 1;
-
         return acc;
     }, { daily: {}, weekly: {}, monthly: {} });
 
@@ -79,39 +85,75 @@ const StatisticsPage = () => {
     const weeklyData = createChartData(completionsByPeriod.weekly, "Completions per Week");
     const monthlyData = createChartData(completionsByPeriod.monthly, "Completions per Month");
 
+    // Extract unique questions from results
+    const questionsMap = {};
+    quiz.results.forEach(result => {
+        result.resultQuestions.forEach(rq => {
+            if (rq.question && !questionsMap[rq.question.id]) {
+                questionsMap[rq.question.id] = rq.question;
+            }
+        });
+    });
+    const uniqueQuestions = Object.values(questionsMap);
+
+    // Prepare pie chart data for a given question
+    const createPieData = (question) => ({
+        labels: question.answers.map(a => a.answer),
+        datasets: [
+            {
+                data: question.answers.map(a => a.amountOfSelection),
+                backgroundColor: [
+                    "#FF6384",
+                    "#36A2EB",
+                    "#FFCE56",
+                    "#4BC0C0",
+                    "#8A2BE2",
+                    "#00FA9A"
+                ],
+            },
+        ],
+    });
+
     return (
         <div className="p-5">
             <header className="d-flex align-items-center gap-3">
-                <BackButton/>
+                <BackButton />
                 <h1>StatisticsPage</h1>
             </header>
-            {
-                quiz?.results?.length ? (
-                    <>
-                        <h1>Average Completion Time: {averageCompletionTime}</h1>
-                        <div className="d-flex justify-content-center align-items-center flex-wrap">
-                            <div className="my-5">
-                                <h2>Completions per Day</h2>
-                                <Bar data={dailyData} />
-                            </div>
-
-                            <div className="my-5">
-                                <h2>Completions per Week</h2>
-                                <Bar data={weeklyData} />
-                            </div>
-
-                            <div className="my-5">
-                                <h2>Completions per Month</h2>
-                                <Bar data={monthlyData} />
-                            </div>
+            {quiz.results.length ? (
+                <>
+                    <h1>Average Completion Time: {averageCompletionTime.toFixed(2)} seconds</h1>
+                    <div className="d-flex justify-content-center align-items-center flex-wrap">
+                        <div className="my-5">
+                            <h2>Completions per Day</h2>
+                            <Bar data={dailyData} redraw key="bar-day" />
                         </div>
-                    </>
-                ) : (
-                    <h1>No data to show statistics</h1>
-                )
-            }
+                        <div className="my-5">
+                            <h2>Completions per Week</h2>
+                            <Bar data={weeklyData} redraw key="bar-week" />
+                        </div>
+                        <div className="my-5">
+                            <h2>Completions per Month</h2>
+                            <Bar data={monthlyData} redraw key="bar-month" />
+                        </div>
+                    </div>
+                    <div className="my-5">
+                        <h2>Answer Distribution per Question</h2>
+                        <div className="d-flex flex-wrap justify-content-center gap-4">
+                            {uniqueQuestions.map(question => (
+                                <div key={question.id} style={{ width: "300px" }}>
+                                    <h3>{question.text}</h3>
+                                    <Pie data={createPieData(question)} redraw key={`pie-${question.id}`} />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <h1>No data to show statistics</h1>
+            )}
         </div>
-    )
-}
+    );
+};
 
 export { StatisticsPage };
