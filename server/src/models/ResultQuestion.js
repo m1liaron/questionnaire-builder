@@ -41,7 +41,7 @@ const ResultQuestion = sequelize.define(
 		isAnswerCorrect: {
 			type: DataTypes.BOOLEAN,
 			allowNull: false,
-		}
+		},
 	},
 	{
 		timestamps: true,

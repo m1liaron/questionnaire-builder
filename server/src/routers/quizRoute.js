@@ -1,7 +1,7 @@
 import express from "express";
 const router = express.Router();
 
-import {createQuizValidateMiddleware} from "../middlewares/createQuiz.validate.middleware.js";
+import { createQuizValidateMiddleware } from "../middlewares/createQuiz.validate.middleware.js";
 import {
 	getQuiz,
 	getQuizzes,

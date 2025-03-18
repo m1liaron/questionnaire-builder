@@ -12,7 +12,7 @@ const Answer = sequelize.define(
 		},
 		answer: {
 			type: DataTypes.STRING,
-			allowNull: false,
+			allowNull: true,
 		},
 		isCorrect: {
 			type: DataTypes.BOOLEAN,
@@ -28,10 +28,10 @@ const Answer = sequelize.define(
 			},
 			validate: {
 				notEmpty: {
-					msg: "QuestionId must be not empty"
-				}
+					msg: "QuestionId must be not empty",
+				},
 			},
-			onDelete: "CASCADE"
+			onDelete: "CASCADE",
 		},
 	},
 	{

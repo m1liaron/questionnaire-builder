@@ -23,10 +23,10 @@ const Question = sequelize.define(
 			},
 			validate: {
 				notEmpty: {
-					msg: "Quiz id must be not empty"
-				}
+					msg: "Quiz id must be not empty",
+				},
 			},
-			onDelete: "CASCADE"
+			onDelete: "CASCADE",
 		},
 		type: {
 			type: DataTypes.ENUM("Text", "Single Choice", "Multiple Choices"),
@@ -34,9 +34,9 @@ const Question = sequelize.define(
 			defaultValue: "Text",
 			validate: {
 				notEmpty: {
-					msg: "Type Must be not empty"
-				}
-			}
+					msg: "Type Must be not empty",
+				},
+			},
 		},
 	},
 	{
