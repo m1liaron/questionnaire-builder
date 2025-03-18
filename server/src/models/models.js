@@ -1,6 +1,6 @@
-import { Quiz } from "./Quiz.js";
-import { Question } from "./Question.js";
 import { Answer } from "./Answer.js";
+import { Question } from "./Question.js";
+import { Quiz } from "./Quiz.js";
 import { Result } from "./Result.js";
 import { ResultQuestion } from "./ResultQuestion.js";
 

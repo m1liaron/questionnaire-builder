@@ -8,7 +8,7 @@ const questionsType = [
 	{ key: "Single Choice", label: "Single Choice" },
 	{ key: "Multiple Choices", label: "Multiple Choices" },
 	{ key: "Image", label: "Image" },
-]
+];
 
 const QuestionItem = ({
 	question,
@@ -77,7 +77,9 @@ const QuestionItem = ({
 							onChange={(e) => onTypeChange(id, e.target.value)}
 						>
 							{questionsType.map((questionType) => (
-								<option key={questionType.key} value={questionType.key}>{questionType.label}</option>
+								<option key={questionType.key} value={questionType.key}>
+									{questionType.label}
+								</option>
 							))}
 						</select>
 					</div>

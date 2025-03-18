@@ -1,5 +1,5 @@
-import { Answer } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
+import { Answer } from "../models/models.js";
 
 const createAnswer = async (req, res) => {
 	try {

@@ -1,43 +1,62 @@
-import {Answer, Quiz, Result, ResultQuestion} from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
+import { sequelize } from "../db/sequelize.js";
+import { Answer, Quiz, Result, ResultQuestion } from "../models/models.js";
 
 const createResult = async (req, res) => {
+	// If using transactions, ensure you have access to your sequelize instance
+	const transaction = await sequelize.transaction();
 	try {
-		const { quizId, timeSpend } = req.body;
-		const result = await Result.create({ quizId, timeSpend });
+		const { quizId, timeSpend, questions } = req.body;
 
-		// Update quiz's amountOfCompletions
-		const foundQuiz = await Quiz.findByPk(quizId);
-		await foundQuiz.update({
-			amountOfCompletions: foundQuiz.amountOfCompletions + 1
-		});
-		await foundQuiz.save();
+		// Create the result record
+		const result = await Result.create({ quizId, timeSpend }, { transaction });
 
+		// Find the quiz and update its completion count
+		const foundQuiz = await Quiz.findByPk(quizId, { transaction });
+		if (!foundQuiz) {
+			throw new Error("Quiz not found");
+		}
+		// Increment the amountOfCompletions and save
+		foundQuiz.amountOfCompletions = (foundQuiz.amountOfCompletions || 0) + 1;
+		await foundQuiz.save({ transaction });
+
+		// Process each question in parallel
 		const resultQuestions = await Promise.all(
-			[...req.body.questions].map(
-				async ({ questionId, answerId, userAnswer, isAnswerCorrect }) => {
-					const resultQuestion = await ResultQuestion.create({
+			questions.map(async (q) => {
+				const { questionId, answerId, userAnswer, isAnswerCorrect } = q;
+				const resultQuestion = await ResultQuestion.create(
+					{
 						resultId: result.id,
 						questionId,
 						answerId,
 						userAnswer,
 						isAnswerCorrect,
-					});
-					const answer = await Answer.findByPk(answerId);
-					await answer.update({
-						amountOfSelection: answer.amountOfSelection += 1
-					})
-					await answer.save();
-					return resultQuestion;
-				},
-			),
+					},
+					{ transaction },
+				);
+
+				// If there's an answer provided, update its selection count
+				if (answerId) {
+					const answer = await Answer.findByPk(answerId, { transaction });
+					if (answer) {
+						answer.amountOfSelection = (answer.amountOfSelection || 0) + 1;
+						await answer.save({ transaction });
+					}
+				}
+				return resultQuestion;
+			}),
 		);
 
-		res.status(StatusCodes.CREATED).json(resultQuestions);
+		// Commit the transaction if all operations succeed
+		await transaction.commit();
+		res.status(StatusCodes.CREATED).json({ result, resultQuestions });
 	} catch (error) {
-		res
-			.status(StatusCodes.INTERNAL_SERVER_ERROR)
-			.json({ error: true, message: error.message });
+		// Roll back the transaction in case of error
+		if (transaction) await transaction.rollback();
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error: true,
+			message: error.message,
+		});
 	}
 };
 

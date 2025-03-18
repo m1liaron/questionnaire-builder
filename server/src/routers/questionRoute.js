@@ -3,8 +3,8 @@ const router = express.Router();
 
 import {
 	getQuestions,
-	updateQuestion,
 	removeQuestion,
+	updateQuestion,
 } from "../controllers/questionController.js";
 
 router.route("/").get(getQuestions);

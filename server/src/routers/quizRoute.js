@@ -1,15 +1,15 @@
 import express from "express";
 const router = express.Router();
 
-import { createQuizValidateMiddleware } from "../middlewares/createQuiz.validate.middleware.js";
 import {
+	createQuiz,
 	getQuiz,
 	getQuizzes,
-	createQuiz,
-	updateQuiz,
+	getStatisticsQuiz,
 	removeQuiz,
-	getStatisticsQuiz
+	updateQuiz,
 } from "../controllers/quizController.js";
+import { createQuizValidateMiddleware } from "../middlewares/createQuiz.validate.middleware.js";
 
 router.post("/", createQuizValidateMiddleware, createQuiz);
 router.route("/").get(getQuizzes);

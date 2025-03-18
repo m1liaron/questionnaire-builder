@@ -1,6 +1,12 @@
-import { Answer, Question, Quiz, Result, ResultQuestion } from "../models/models.js";
 import { StatusCodes } from "http-status-codes";
 import { sequelize } from "../db/sequelize.js";
+import {
+	Answer,
+	Question,
+	Quiz,
+	Result,
+	ResultQuestion,
+} from "../models/models.js";
 
 /**
  * quizData {object} name, description
@@ -86,32 +92,37 @@ const getQuizzes = async (req, res) => {
 	try {
 		const { sort = "name", order = "ASC", page = 1, limit = 5 } = req.query;
 		const orderDirection = order.toUpperCase() === "DESC" ? -1 : 1;
-		const pageNumber = parseInt(page, 10);
-		const itemsPerPage = parseInt(limit, 10);
+		const pageNumber = Number.parseInt(page, 10);
+		const itemsPerPage = Number.parseInt(limit, 10);
 
 		const foundQuizzes = await Quiz.findAll({
 			include: [
 				{ model: Question, as: "questions", attributes: ["id"] },
-				{ model: Result, as: "results", attributes: ["id"] }
+				{ model: Result, as: "results", attributes: ["id"] },
 			],
-			order: [["createdAt", "DESC"]] // Default sorting in DB
+			order: [["createdAt", "DESC"]], // Default sorting in DB
 		});
 
 		const quizzesWithCount = foundQuizzes.map((quiz) => ({
 			...quiz.toJSON(),
 			questionsAmount: quiz.questions?.length || 0,
-			amountOfCompletions: quiz.results?.length || 0
+			amountOfCompletions: quiz.results?.length || 0,
 		}));
 
 		// Handle sorting dynamically for computed fields
 		if (["questionsAmount", "amountOfCompletions"].includes(sort)) {
 			quizzesWithCount.sort((a, b) => (a[sort] - b[sort]) * orderDirection);
 		} else {
-			quizzesWithCount.sort((a, b) => a[sort].localeCompare(b[sort]) * orderDirection);
+			quizzesWithCount.sort(
+				(a, b) => a[sort].localeCompare(b[sort]) * orderDirection,
+			);
 		}
 
 		const offset = (pageNumber - 1) * itemsPerPage;
-		const paginatedQuizzes = quizzesWithCount.slice(offset, offset + itemsPerPage);
+		const paginatedQuizzes = quizzesWithCount.slice(
+			offset,
+			offset + itemsPerPage,
+		);
 		const haveMoreQuizzes = offset + itemsPerPage < quizzesWithCount.length;
 
 		res.status(200).json({ quizzes: paginatedQuizzes, haveMoreQuizzes });
@@ -128,17 +139,19 @@ const getStatisticsQuiz = async (req, res) => {
 				{
 					model: Result,
 					as: "results",
-					include: [{ 
-						model: ResultQuestion, 
-						as: "resultQuestions",
-						include: [
-							{ 
-								model: Question, 
-								as: "question",
-								include: [{ model: Answer, as: "answers" }]
-							},
-						]
-					}],
+					include: [
+						{
+							model: ResultQuestion,
+							as: "resultQuestions",
+							include: [
+								{
+									model: Question,
+									as: "question",
+									include: [{ model: Answer, as: "answers" }],
+								},
+							],
+						},
+					],
 				},
 			],
 		});
@@ -155,7 +168,6 @@ const getStatisticsQuiz = async (req, res) => {
 			.json({ error: true, message: error.message });
 	}
 };
-
 
 const updateQuiz = async (req, res) => {
 	const { quizId } = req.params;
@@ -185,7 +197,10 @@ const updateQuiz = async (req, res) => {
 		}
 
 		// Update the quiz fields
-		await foundQuiz.update({ name, description, questionsAmount: reqQuestions.length, }, { transaction });
+		await foundQuiz.update(
+			{ name, description, questionsAmount: reqQuestions.length },
+			{ transaction },
+		);
 
 		// Process each question in the request
 		for (const questionData of reqQuestions) {
@@ -316,4 +331,11 @@ const removeQuiz = async (req, res) => {
 	}
 };
 
-export { createQuiz, getQuiz, getQuizzes, updateQuiz, removeQuiz, getStatisticsQuiz };
+export {
+	createQuiz,
+	getQuiz,
+	getQuizzes,
+	updateQuiz,
+	removeQuiz,
+	getStatisticsQuiz,
+};

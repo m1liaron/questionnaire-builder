@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import Spinner from "react-bootstrap/Spinner";
 import { FaSortAmountDownAlt, FaSortAmountUpAlt } from "react-icons/fa";
 import { MdOutlineSort } from "react-icons/md";
 import { RiResetLeftFill } from "react-icons/ri";
@@ -8,7 +9,6 @@ import { Link } from "react-router-dom";
 import { AppPath } from "../../common/enums/AppPath.js";
 import { apiUrl } from "../../common/enums/apiUrl.js";
 import { QuizList } from "../../components/QuizList/QuizList.jsx";
-import Spinner from 'react-bootstrap/Spinner';
 
 const sortOptions = [
 	{ key: "name", label: "Name" },
@@ -27,6 +27,7 @@ const HomePage = () => {
 	// When sort options change, reset to first page and clear quizzes
 	useEffect(() => {
 		setPage(1);
+		getQuizzes();
 	}, [sortBy, order]);
 
 	// Check if the user has scrolled to the bottom
@@ -37,7 +38,8 @@ const HomePage = () => {
 		const scrollHeight =
 			(document.documentElement && document.documentElement.scrollHeight) ||
 			document.body.scrollHeight;
-		const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+		const clientHeight =
+			document.documentElement.clientHeight || window.innerHeight;
 		return scrollTop + clientHeight >= scrollHeight - 50; // 50px buffer
 	};
 
@@ -55,25 +57,26 @@ const HomePage = () => {
 		};
 	}, [haveMoreQuizzes]);
 
+	const getQuizzes = async () => {
+		try {
+			const response = await axios.get(
+				`${apiUrl}/quizzes?sort=${sortBy}&order=${order}&page=${page}`,
+			);
+			const { quizzes, haveMoreQuizzes } = response.data || [];
+			if (page === 1) {
+				setQuizzes(quizzes);
+			} else {
+				setQuizzes((prevQuizzes) => [...prevQuizzes, ...quizzes]);
+			}
+			setHaveMoreQuizzes(haveMoreQuizzes);
+		} catch (error) {
+			console.error("Error fetching quizzes:", error);
+		}
+	};
+
 	// Fetch quizzes whenever page, sortBy, or order changes
 	useEffect(() => {
-		const getQuizzes = async () => {
-			try {
-				const response = await axios.get(
-					`${apiUrl}/quizzes?sort=${sortBy}&order=${order}&page=${page}`
-				);
-				const { quizzes, haveMoreQuizzes } = response.data || [];
-				if (page === 1) {
-					setQuizzes(quizzes);
-				} else {
-					setQuizzes((prevQuizzes) => [...prevQuizzes, ...quizzes]);
-				}
-				setHaveMoreQuizzes(haveMoreQuizzes)
-			} catch (error) {
-				console.error("Error fetching quizzes:", error);
-			}
-		};
-		if(haveMoreQuizzes) {
+		if (haveMoreQuizzes) {
 			getQuizzes();
 		}
 	}, [page, sortBy, order, haveMoreQuizzes]);
@@ -106,11 +109,23 @@ const HomePage = () => {
 					</div>
 					<div className="d-flex p-2 justify-content-between">
 						{order === "ASC" ? (
-							<FaSortAmountUpAlt size={30} cursor="pointer" onClick={toggleOrder} />
+							<FaSortAmountUpAlt
+								size={30}
+								cursor="pointer"
+								onClick={toggleOrder}
+							/>
 						) : (
-							<FaSortAmountDownAlt size={30} cursor="pointer" onClick={toggleOrder} />
+							<FaSortAmountDownAlt
+								size={30}
+								cursor="pointer"
+								onClick={toggleOrder}
+							/>
 						)}
-						<RiResetLeftFill size={30} cursor="pointer" onClick={() => setSortBy("name")} />
+						<RiResetLeftFill
+							size={30}
+							cursor="pointer"
+							onClick={() => setSortBy("name")}
+						/>
 					</div>
 				</div>
 			)}
