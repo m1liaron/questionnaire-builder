@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { AppPath } from "../../common/enums/AppPath.js";
 import { apiUrl } from "../../common/enums/apiUrl.js";
 import { QuizList } from "../../components/QuizList/QuizList.jsx";
+import Spinner from 'react-bootstrap/Spinner';
 
 const sortOptions = [
 	{ key: "name", label: "Name" },
@@ -20,21 +21,63 @@ const HomePage = () => {
 	const [sortBy, setSortBy] = useState("name");
 	const [order, setOrder] = useState("ASC");
 	const [showSortModal, setShowSortModal] = useState(false);
+	const [page, setPage] = useState(1);
+	const [haveMoreQuizzes, setHaveMoreQuizzes] = useState(true);
 
+	// When sort options change, reset to first page and clear quizzes
+	useEffect(() => {
+		setPage(1);
+		setQuizzes([]);
+	}, [sortBy, order]);
+
+	// Check if the user has scrolled to the bottom
+	const isBottomOfPage = () => {
+		const scrollTop =
+			(document.documentElement && document.documentElement.scrollTop) ||
+			document.body.scrollTop;
+		const scrollHeight =
+			(document.documentElement && document.documentElement.scrollHeight) ||
+			document.body.scrollHeight;
+		const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+		return scrollTop + clientHeight >= scrollHeight - 50; // 50px buffer
+	};
+
+	// Increase page if bottom reached
+	const ifBottomPageAndMorePage = () => {
+		if (isBottomOfPage() && haveMoreQuizzes) {
+			setPage((prevPage) => prevPage + 1);
+		}
+	};
+
+	useEffect(() => {
+		window.addEventListener("scroll", ifBottomPageAndMorePage);
+		return () => {
+			window.removeEventListener("scroll", ifBottomPageAndMorePage);
+		};
+	}, [haveMoreQuizzes]);
+
+	// Fetch quizzes whenever page, sortBy, or order changes
 	useEffect(() => {
 		const getQuizzes = async () => {
 			try {
 				const response = await axios.get(
-					`${apiUrl}/quizzes?sort=${sortBy}&order=${order}`,
+					`${apiUrl}/quizzes?sort=${sortBy}&order=${order}&page=${page}`
 				);
-				setQuizzes(response.data);
+				const { quizzes, haveMoreQuizzes } = response.data || [];
+				if (page === 1) {
+					setQuizzes(quizzes);
+				} else {
+					setQuizzes((prevQuizzes) => [...prevQuizzes, ...quizzes]);
+				}
+				setHaveMoreQuizzes(haveMoreQuizzes)
 			} catch (error) {
 				console.error("Error fetching quizzes:", error);
 			}
 		};
-
-		getQuizzes();
-	}, [sortBy, order]);
+		if(haveMoreQuizzes) {
+			getQuizzes();
+		}
+	}, [page, sortBy, order]);
 
 	const toggleOrder = () => setOrder(order === "ASC" ? "DESC" : "ASC");
 
@@ -64,11 +107,11 @@ const HomePage = () => {
 					</div>
 					<div className="d-flex p-2 justify-content-between">
 						{order === "ASC" ? (
-							<FaSortAmountUpAlt size={30} onClick={toggleOrder} />
+							<FaSortAmountUpAlt size={30} cursor="pointer" onClick={toggleOrder} />
 						) : (
-							<FaSortAmountDownAlt size={30} onClick={toggleOrder} />
+							<FaSortAmountDownAlt size={30} cursor="pointer" onClick={toggleOrder} />
 						)}
-						<RiResetLeftFill size={30} onClick={() => setSortBy("name")} />
+						<RiResetLeftFill size={30} cursor="pointer" onClick={() => setSortBy("name")} />
 					</div>
 				</div>
 			)}
@@ -76,7 +119,17 @@ const HomePage = () => {
 			<Link to={AppPath.CreateQuiz}>
 				<Button>Create Quiz</Button>
 			</Link>
+			{/* Render the list of quizzes */}
 			<QuizList quizzes={quizzes} setQuizzes={setQuizzes} />
+			{haveMoreQuizzes && (
+				<Button
+					style={{ margin: "0 auto" }}
+					className="d-flex justify-content-center"
+					onClick={() => setPage(page + 1)}
+				>
+					Loading...
+				</Button>
+			)}
 		</div>
 	);
 };
