@@ -84,7 +84,7 @@ const getQuiz = async (req, res) => {
 };
 const getQuizzes = async (req, res) => {
 	try {
-		const { sort = "name", order = "ASC", page = 1, limit = 20 } = req.query;
+		const { sort = "name", order = "ASC", page = 1, limit = 5 } = req.query;
 		const orderDirection = order.toUpperCase() === "DESC" ? -1 : 1;
 		const pageNumber = parseInt(page, 10);
 		const itemsPerPage = parseInt(limit, 10);
@@ -112,8 +112,9 @@ const getQuizzes = async (req, res) => {
 
 		const offset = (pageNumber - 1) * itemsPerPage;
 		const paginatedQuizzes = quizzesWithCount.slice(offset, offset + itemsPerPage);
+		const haveMoreQuizzes = offset + itemsPerPage < quizzesWithCount.length;
 
-		res.status(200).json(paginatedQuizzes);
+		res.status(200).json({ quizzes: paginatedQuizzes, haveMoreQuizzes });
 	} catch (error) {
 		res.status(500).json({ error: true, message: error.message });
 	}
