@@ -4,6 +4,7 @@ import { Button, Form, ListGroup } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import { apiUrl } from "../../common/enums/apiUrl.js";
 import { BackButton } from "../../components/common/BackButton/BackButton.jsx";
+import {convertImageToBase64} from "../../utils/convertImageToBase64.js";
 
 const RunQuizPage = () => {
 	const { quizId } = useParams();
@@ -66,12 +67,6 @@ const RunQuizPage = () => {
 		}
 		return () => clearInterval(intervalId);
 	}, [isQuizStarted]);
-
-
-	useEffect(() => {
-		setCurrentAnswer("");
-		setCurrentAnswers([]);
-	}, [questionIndex]);
 
 	const handleStartQuiz = () => {
 		setIsQuizStarted(true);
@@ -242,6 +237,20 @@ const RunQuizPage = () => {
         };
     }, []);
 
+	const handleSaveImage = async (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			try {
+				const dataUrl  = await convertImageToBase64(file);
+				console.log(dataUrl)
+				setCurrentAnswer(dataUrl);
+			} catch (error) {
+				console.error("Failed to convert image", error);
+			}
+		}
+	};
+
+
 	return (
 		<div className="p-5">
 			<header className="d-flex align-items-center gap-5">
@@ -262,10 +271,10 @@ const RunQuizPage = () => {
                             </ListGroup.Item>
                             <ListGroup.Item
                                 style={{
-                                    color: userAnswer === answer?.answer ? "green" : "red",
+                                    color: question.type !== "Text" && question.type !== "Image" && userAnswer === answer?.answer ? "green" : "red",
                                 }}
                             >
-                                <strong>Your Answer:</strong> {userAnswer}
+                                <strong style={{ lineBreak: "anywhere"}}>Your Answer:</strong> {userAnswer}
                             </ListGroup.Item>
                         </ListGroup>
                     ))}
@@ -285,6 +294,27 @@ const RunQuizPage = () => {
                             onChange={(e) => setCurrentAnswer(e.target.value)}
                         />
                     )}
+					{quiz?.questions[questionIndex]?.type === "Image" && (
+						<>
+							{currentAnswer && (
+								<img src={currentAnswer} alt="Answer Preview" style={{ maxWidth: 400 }} />
+							)}
+							<input
+								type="file"
+								accept="image/*"
+								onChange={handleSaveImage}
+							/>
+
+							<Form.Control
+								placeholder="Your Image Url"
+								aria-label="Your Image Url"
+								aria-describedby="basic-addon1"
+								style={{ maxWidth: 400 }}
+								value={currentAnswer}
+								onChange={(e) => setCurrentAnswer(e.target.value)}
+							/>
+						</>
+					)}
 					<RenderQuestionAnswer />
 					<div className="mb-3">
 						<span>
