@@ -1,3 +1,39 @@
+# Questionnaire Project To-Do List
+
+## Base Level
+- [x] **Questionnaire Catalog Page:**
+  - [x] Display a paginated list of available questionnaires.
+  - [x] Each questionnaire card should include:
+    - [x] Questionnaire name.
+    - [x] Description.
+    - [x] Amount of questions.
+    - [x] Amount of completions.
+    - [x] Actions: edit, run, delete (with "edit" action linking to a page similar to the creation page).
+
+## Middle Level
+- [x] **Questionnaire Catalog Page:**
+  - [x] Add ability to sort questionnaires by:
+    - [x] Name.
+    - [x] Amount of questions.
+    - [x] Amount of completions.
+- [x] **Questionnaire Builder Page:**
+  - [x] Add drag-and-drop functionality to allow users to re-order questions/answers.
+- [x] **Interactive Questionnaire Page:**
+  - [x] Save intermediate completion state so that when the user refreshes the page, they can continue from where they left off.
+
+## Advanced Level
+- [x] **Questionnaire Catalog Page:**
+  - [x] Add infinite scroll pagination (automatically load more questionnaires as the user scrolls).
+- [x] **Questionnaire Statistics Page:**
+  - [x] Display general statistics for the questionnaire including:
+    - [x] Average completion time.
+    - [x] Amount of completions per day/week/month (using line/bar charts).
+    - [x] Pie chart for each question (displaying the count of selections per question answer).
+- [x] **Questionnaire Builder Page:**
+  - [x] Add an "image" question type to allow users to upload images for this question during questionnaire completion.
+
+
+
 Here's a basic `README.md` for running a Vite + React app:
 
 ```markdown
