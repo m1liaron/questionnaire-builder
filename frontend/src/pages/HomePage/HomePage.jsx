@@ -20,12 +20,13 @@ const HomePage = () => {
 	const [sortBy, setSortBy] = useState("name");
 	const [order, setOrder] = useState("ASC");
 	const [showSortModal, setShowSortModal] = useState(false);
+	const [page, setPage] = useState(1);
 
 	useEffect(() => {
 		const getQuizzes = async () => {
 			try {
 				const response = await axios.get(
-					`${apiUrl}/quizzes?sort=${sortBy}&order=${order}`,
+					`${apiUrl}/quizzes?sort=${sortBy}&order=${order}&page=${page}`,
 				);
 				setQuizzes(response.data);
 			} catch (error) {
